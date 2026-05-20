@@ -1,0 +1,27 @@
+{
+  "band_name": "我们的乐队",
+  "password": "band2024",
+  "events": [
+    {
+      "date": "2024-05-20",
+      "title": "年会演出",
+      "description": "在学校年会上的表演，全场最燃！",
+      "photos": ["images/sample/concert1.jpg", "images/sample/concert2.jpg"],
+      "video": null
+    },
+    {
+      "date": "2023-12-25",
+      "title": "圣诞排练",
+      "description": "圣诞节前的排练日常",
+      "photos": ["images/sample/rehearsal1.jpg"],
+      "video": null
+    },
+    {
+      "date": "2023-09-15",
+      "title": "乐队成立",
+      "description": "我们第一次聚在一起玩音乐的日子",
+      "photos": ["images/sample/founding.jpg"],
+      "video": null
+    }
+  ]
+}
