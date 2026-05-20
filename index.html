@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>我们的乐队 - 时光线</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- 密码门 -->
+  <div id="password-gate" class="password-gate">
+    <div class="password-box">
+      <h1 class="band-logo">🎸</h1>
+      <h2>我们的乐队</h2>
+      <p>输入密码查看回忆</p>
+      <input type="password" id="password-input" placeholder="请输入密码" autocomplete="off">
+      <button id="password-btn">进入</button>
+      <p id="password-error" class="error-msg" style="display:none;">密码错误，请重试</p>
+    </div>
+  </div>
+
+  <!-- 主内容 -->
+  <div id="main-content" class="main-content" style="display:none;">
+    <!-- 顶部 -->
+    <header class="header">
+      <h1 id="band-name">我们的乐队</h1>
+      <p class="subtitle">我们的时光线</p>
+    </header>
+
+    <!-- 时间线 -->
+    <div class="timeline" id="timeline">
+      <!-- 由 JavaScript 动态生成 -->
+    </div>
+
+    <!-- 二维码 -->
+    <footer class="footer">
+      <p>扫码分享给乐队成员</p>
+      <img src="qrcode.png" alt="二维码" class="qrcode" onerror="this.style.display='none'">
+    </footer>
+  </div>
+
+  <!-- 灯箱 -->
+  <div id="lightbox" class="lightbox" style="display:none;">
+    <button class="lightbox-close" id="lightbox-close">&times;</button>
+    <button class="lightbox-prev" id="lightbox-prev">&#10094;</button>
+    <img id="lightbox-img" src="" alt="">
+    <button class="lightbox-next" id="lightbox-next">&#10095;</button>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
