@@ -1,0 +1,373 @@
+/* ========== 基础重置 ========== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+    "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  background: #1a1a2e;
+  color: #e0e0e0;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ========== 密码门 ========== */
+.password-gate {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.password-box {
+  text-align: center;
+  padding: 40px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 16px;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  max-width: 400px;
+  width: 90%;
+}
+
+.band-logo {
+  font-size: 48px;
+  margin-bottom: 16px;
+}
+
+.password-box h2 {
+  color: #e8b849;
+  font-size: 24px;
+  margin-bottom: 8px;
+}
+
+.password-box p {
+  color: #888;
+  margin-bottom: 24px;
+}
+
+.password-box input {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  font-size: 16px;
+  outline: none;
+  margin-bottom: 16px;
+  transition: border-color 0.3s;
+}
+
+.password-box input:focus {
+  border-color: #e8b849;
+}
+
+.password-box button {
+  width: 100%;
+  padding: 12px;
+  background: #e8b849;
+  color: #1a1a2e;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.password-box button:hover {
+  background: #d4a639;
+}
+
+.error-msg {
+  color: #e74c3c;
+  margin-top: 12px;
+  font-size: 14px;
+}
+
+/* ========== 主内容 ========== */
+.main-content {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.header {
+  text-align: center;
+  padding: 40px 0 60px;
+}
+
+.header h1 {
+  color: #e8b849;
+  font-size: 32px;
+  margin-bottom: 8px;
+}
+
+.subtitle {
+  color: #888;
+  font-size: 16px;
+}
+
+/* ========== 时间线 ========== */
+.timeline {
+  position: relative;
+  padding: 20px 0;
+}
+
+.timeline::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: linear-gradient(to bottom, transparent, #e8b849, transparent);
+  transform: translateX(-50%);
+}
+
+/* ========== 事件卡片 ========== */
+.event-card {
+  position: relative;
+  width: 45%;
+  padding: 24px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  margin-bottom: 40px;
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.event-card.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* 左右交替 */
+.event-card:nth-child(odd) {
+  margin-left: 5%;
+}
+
+.event-card:nth-child(even) {
+  margin-left: 50%;
+}
+
+/* 时间线节点 */
+.event-card::before {
+  content: "";
+  position: absolute;
+  top: 30px;
+  width: 12px;
+  height: 12px;
+  background: #e8b849;
+  border-radius: 50%;
+  z-index: 1;
+}
+
+.event-card:nth-child(odd)::before {
+  right: -6%;
+  transform: translateX(50%);
+}
+
+.event-card:nth-child(even)::before {
+  left: -6%;
+  transform: translateX(-50%);
+}
+
+/* 连接线 */
+.event-card::after {
+  content: "";
+  position: absolute;
+  top: 35px;
+  width: 5%;
+  height: 2px;
+  background: rgba(232, 184, 73, 0.3);
+}
+
+.event-card:nth-child(odd)::after {
+  right: -5%;
+}
+
+.event-card:nth-child(even)::after {
+  left: -5%;
+}
+
+.event-date {
+  display: inline-block;
+  background: rgba(232, 184, 73, 0.15);
+  color: #e8b849;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 13px;
+  margin-bottom: 12px;
+}
+
+.event-title {
+  font-size: 20px;
+  color: #fff;
+  margin-bottom: 8px;
+}
+
+.event-desc {
+  color: #aaa;
+  font-size: 14px;
+  line-height: 1.6;
+  margin-bottom: 16px;
+}
+
+/* ========== 照片网格 ========== */
+.photo-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: 8px;
+}
+
+.photo-grid img {
+  width: 100%;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.photo-grid img:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 15px rgba(232, 184, 73, 0.3);
+}
+
+/* ========== 视频按钮 ========== */
+.video-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: rgba(232, 184, 73, 0.15);
+  color: #e8b849;
+  border-radius: 8px;
+  text-decoration: none;
+  font-size: 14px;
+  margin-top: 12px;
+  transition: background 0.3s;
+}
+
+.video-link:hover {
+  background: rgba(232, 184, 73, 0.3);
+}
+
+/* ========== 灯箱 ========== */
+.lightbox {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.95);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+}
+
+.lightbox img {
+  max-width: 90%;
+  max-height: 90vh;
+  object-fit: contain;
+  border-radius: 8px;
+}
+
+.lightbox-close {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 32px;
+  cursor: pointer;
+  z-index: 2001;
+}
+
+.lightbox-prev,
+.lightbox-next {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  color: #fff;
+  font-size: 24px;
+  padding: 16px;
+  cursor: pointer;
+  border-radius: 50%;
+  transition: background 0.3s;
+}
+
+.lightbox-prev { left: 20px; }
+.lightbox-next { right: 20px; }
+
+.lightbox-prev:hover,
+.lightbox-next:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* ========== 底部 ========== */
+.footer {
+  text-align: center;
+  padding: 60px 0 40px;
+  color: #666;
+}
+
+.qrcode {
+  width: 150px;
+  margin-top: 16px;
+  border-radius: 8px;
+  border: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+/* ========== 响应式 - 手机端 ========== */
+@media (max-width: 768px) {
+  .timeline::before {
+    left: 20px;
+  }
+
+  .event-card {
+    width: calc(100% - 50px);
+    margin-left: 50px !important;
+  }
+
+  .event-card::before {
+    left: -36px !important;
+    right: auto !important;
+    transform: none !important;
+  }
+
+  .event-card::after {
+    left: -20px !important;
+    right: auto !important;
+    width: 20px !important;
+  }
+
+  .header h1 {
+    font-size: 24px;
+  }
+
+  .photo-grid {
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+  }
+
+  .photo-grid img {
+    height: 80px;
+  }
+}
