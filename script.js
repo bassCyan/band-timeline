@@ -2,14 +2,16 @@
 let bandData = null;
 let currentLightboxPhotos = [];
 let currentLightboxIndex = 0;
+let scrollObserver = null;
 
 // ========== 初始化 ==========
 document.addEventListener("DOMContentLoaded", async () => {
   try {
     const response = await fetch("data.json");
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
     bandData = await response.json();
   } catch (e) {
-    alert("无法加载数据文件，请检查 data.json 是否存在");
+    showLoadingError();
     return;
   }
 
@@ -22,6 +24,17 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 });
 
+// ========== Loading / Error ==========
+function showLoadingError() {
+  const gate = document.getElementById("password-gate");
+  if (gate) {
+    gate.querySelector(".password-box p").textContent =
+      "加载失败，请刷新页面重试";
+    gate.querySelector(".password-box input").style.display = "none";
+    gate.querySelector(".password-box button").style.display = "none";
+  }
+}
+
 // ========== 密码门 ==========
 function setupPasswordGate() {
   const btn = document.getElementById("password-btn");
@@ -32,6 +45,8 @@ function setupPasswordGate() {
   input.addEventListener("keydown", (e) => {
     if (e.key === "Enter") checkPassword(input, error);
   });
+  // 自动聚焦
+  input.focus();
 }
 
 function checkPassword(input, error) {
@@ -54,11 +69,43 @@ function showMainContent() {
   setupLightbox();
 }
 
+// ========== 工具函数 ==========
+function escapeHtml(str) {
+  const div = document.createElement("div");
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+function escapeAttr(str) {
+  return str
+    .replace(/&/g, "&amp;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+}
+
+function formatDate(dateStr) {
+  // 直接拆字符串，避免时区问题
+  const parts = dateStr.split("-");
+  if (parts.length === 3) {
+    return `${parts[0]}.${parts[1]}.${parts[2]}`;
+  }
+  return dateStr;
+}
+
 // ========== 时间线渲染 ==========
 function renderTimeline() {
   const timeline = document.getElementById("timeline");
+
+  if (!bandData.events || bandData.events.length === 0) {
+    timeline.innerHTML =
+      '<div class="empty-state">还没有添加事件，运行 add_event.py 开始添加</div>';
+    return;
+  }
+
   const events = [...bandData.events].sort(
-    (a, b) => new Date(b.date) - new Date(a.date)
+    (a, b) => (b.date > a.date ? 1 : b.date < a.date ? -1 : 0)
   );
 
   events.forEach((event) => {
@@ -66,7 +113,6 @@ function renderTimeline() {
     timeline.appendChild(card);
   });
 
-  // 设置滚动动画
   setupScrollAnimation();
 }
 
@@ -86,40 +132,32 @@ function createEventCard(event) {
   if (event.photos && event.photos.length > 0) {
     html += '<div class="photo-grid">';
     event.photos.forEach((photo, index) => {
-      html += `<img src="${photo}" alt="照片" loading="lazy" data-index="${index}" onclick="openLightbox(this)">`;
+      html += `<img src="${escapeAttr(photo)}" alt="照片" loading="lazy" data-index="${index}" onclick="openLightbox(this)">`;
     });
     html += "</div>";
   }
 
   if (event.video) {
-    html += `<a href="${event.video}" target="_blank" class="video-link">▶ 观看视频</a>`;
+    html += `<a href="${escapeAttr(event.video)}" target="_blank" rel="noopener" class="video-link">&#9654; 观看视频</a>`;
   }
 
   card.innerHTML = html;
   return card;
 }
 
-function formatDate(dateStr) {
-  const d = new Date(dateStr);
-  const year = d.getFullYear();
-  const month = String(d.getMonth() + 1).padStart(2, "0");
-  const day = String(d.getDate()).padStart(2, "0");
-  return `${year}.${month}.${day}`;
-}
-
-function escapeHtml(str) {
-  const div = document.createElement("div");
-  div.textContent = str;
-  return div.innerHTML;
-}
-
 // ========== 滚动动画 ==========
 function setupScrollAnimation() {
-  const observer = new IntersectionObserver(
+  // 清理之前的 observer
+  if (scrollObserver) {
+    scrollObserver.disconnect();
+  }
+
+  scrollObserver = new IntersectionObserver(
     (entries) => {
       entries.forEach((entry) => {
         if (entry.isIntersecting) {
           entry.target.classList.add("visible");
+          scrollObserver.unobserve(entry.target);
         }
       });
     },
@@ -127,7 +165,7 @@ function setupScrollAnimation() {
   );
 
   document.querySelectorAll(".event-card").forEach((card) => {
-    observer.observe(card);
+    scrollObserver.observe(card);
   });
 }
 
@@ -159,7 +197,7 @@ function openLightbox(imgElement) {
   const photos = Array.from(card.querySelectorAll(".photo-grid img")).map(
     (img) => img.src
   );
-  const index = parseInt(imgElement.dataset.index);
+  const index = parseInt(imgElement.dataset.index, 10);
 
   currentLightboxPhotos = photos;
   currentLightboxIndex = index;

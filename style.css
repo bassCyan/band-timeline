@@ -474,9 +474,7 @@ body {
 }
 
 /* ========== 空状态 ========== */
-.timeline:empty::after {
-  content: "还没有添加事件，运行 add_event.py 开始添加";
-  display: block;
+.empty-state {
   text-align: center;
   padding: 64px 24px;
   color: var(--text-tertiary);
@@ -526,7 +524,7 @@ body {
     height: 80px;
   }
 
-  .timeline:empty::after {
+  .empty-state {
     margin: 0;
   }
 }
