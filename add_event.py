@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 """添加新事件到乐队时间线网站"""
 
 import json
@@ -106,7 +107,7 @@ def add_event():
 
     data["events"].append(event)
     save_data(data)
-    print(f"\n✓ 事件 '{title}' 已添加！")
+    print(f"\n[OK] 事件 '{title}' 已添加！")
 
 
 if __name__ == "__main__":
