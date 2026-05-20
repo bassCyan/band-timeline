@@ -1,3 +1,51 @@
+/* ========== 设计系统 ========== */
+/*
+ * Spacing scale:  4, 8, 12, 16, 24, 32, 48, 64, 96, 128
+ * Type scale:     12, 14, 16, 18, 20, 24, 30, 36, 48
+ * Grey scale:     HSL(230, 15%, X%)  — 冷色调灰，避免"死灰"
+ * Primary (金):   HSL(42, 76%, X%)   — 暖金色
+ * Shadow system:  sm / md / lg
+ */
+
+:root {
+  /* Grey scale (冷色调) */
+  --grey-50:  hsl(230, 15%, 96%);
+  --grey-100: hsl(230, 15%, 88%);
+  --grey-200: hsl(230, 15%, 76%);
+  --grey-300: hsl(230, 15%, 64%);
+  --grey-400: hsl(230, 15%, 52%);
+  --grey-500: hsl(230, 15%, 40%);
+  --grey-600: hsl(230, 15%, 28%);
+  --grey-700: hsl(230, 15%, 20%);
+  --grey-800: hsl(230, 15%, 14%);
+  --grey-900: hsl(230, 15%, 8%);
+
+  /* Primary (金色) */
+  --gold-50:  hsl(42, 76%, 95%);
+  --gold-100: hsl(42, 76%, 80%);
+  --gold-200: hsl(42, 76%, 65%);
+  --gold-300: hsl(42, 76%, 55%);
+  --gold-400: hsl(42, 76%, 48%);
+  --gold-500: hsl(42, 76%, 40%);
+
+  /* Background */
+  --bg-primary:   hsl(240, 20%, 10%);
+  --bg-secondary: hsl(240, 18%, 13%);
+  --bg-card:      hsl(240, 16%, 16%);
+  --bg-elevated:  hsl(240, 14%, 20%);
+
+  /* Text */
+  --text-primary:   hsl(230, 15%, 92%);
+  --text-secondary: hsl(230, 12%, 60%);
+  --text-tertiary:  hsl(230, 10%, 45%);
+
+  /* Shadows (光源从上方来) */
+  --shadow-sm:  0 1px 2px rgba(0,0,0,0.3), 0 1px 3px rgba(0,0,0,0.15);
+  --shadow-md:  0 4px 6px rgba(0,0,0,0.3), 0 2px 4px rgba(0,0,0,0.2);
+  --shadow-lg:  0 10px 25px rgba(0,0,0,0.4), 0 4px 10px rgba(0,0,0,0.25);
+  --shadow-xl:  0 20px 50px rgba(0,0,0,0.5), 0 8px 20px rgba(0,0,0,0.3);
+}
+
 /* ========== 基础重置 ========== */
 * {
   margin: 0;
@@ -8,10 +56,12 @@
 body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
     "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
-  background: #1a1a2e;
-  color: #e0e0e0;
+  background: var(--bg-primary);
+  color: var(--text-primary);
   min-height: 100vh;
   overflow-x: hidden;
+  font-size: 16px;
+  line-height: 1.6;
 }
 
 /* ========== 密码门 ========== */
@@ -21,107 +71,143 @@ body {
   left: 0;
   width: 100%;
   height: 100%;
-  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  background: var(--bg-primary);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 1000;
 }
 
+/* 密码门背景装饰 */
+.password-gate::before {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle at 30% 40%, hsla(42, 76%, 48%, 0.06) 0%, transparent 50%),
+              radial-gradient(circle at 70% 60%, hsla(230, 40%, 30%, 0.1) 0%, transparent 50%);
+  pointer-events: none;
+}
+
 .password-box {
+  position: relative;
   text-align: center;
-  padding: 40px;
-  background: rgba(255, 255, 255, 0.05);
+  padding: 48px 40px;
+  background: var(--bg-card);
   border-radius: 16px;
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid hsla(230, 15%, 100%, 0.08);
   max-width: 400px;
   width: 90%;
+  box-shadow: var(--shadow-xl);
+  /* 顶部金色强调线 */
+  border-top: 3px solid var(--gold-400);
 }
 
 .band-logo {
   font-size: 48px;
   margin-bottom: 16px;
+  filter: drop-shadow(0 4px 12px hsla(42, 76%, 48%, 0.3));
 }
 
 .password-box h2 {
-  color: #e8b849;
+  color: var(--gold-300);
   font-size: 24px;
+  font-weight: 700;
   margin-bottom: 8px;
+  letter-spacing: -0.02em;
 }
 
-.password-box p {
-  color: #888;
+.password-box > p {
+  color: var(--text-secondary);
+  font-size: 14px;
   margin-bottom: 24px;
 }
 
 .password-box input {
   width: 100%;
   padding: 12px 16px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 1px solid hsla(230, 15%, 100%, 0.12);
   border-radius: 8px;
-  background: rgba(255, 255, 255, 0.1);
-  color: #fff;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
   font-size: 16px;
   outline: none;
   margin-bottom: 16px;
-  transition: border-color 0.3s;
+  transition: border-color 0.2s, box-shadow 0.2s;
 }
 
 .password-box input:focus {
-  border-color: #e8b849;
+  border-color: var(--gold-400);
+  box-shadow: 0 0 0 3px hsla(42, 76%, 48%, 0.15);
 }
 
 .password-box button {
   width: 100%;
-  padding: 12px;
-  background: #e8b849;
-  color: #1a1a2e;
+  padding: 12px 24px;
+  background: var(--gold-400);
+  color: var(--grey-900);
   border: none;
   border-radius: 8px;
   font-size: 16px;
   font-weight: 600;
   cursor: pointer;
-  transition: background 0.3s;
+  transition: background 0.2s, transform 0.1s, box-shadow 0.2s;
+  box-shadow: var(--shadow-sm);
 }
 
 .password-box button:hover {
-  background: #d4a639;
+  background: var(--gold-300);
+  box-shadow: var(--shadow-md);
+}
+
+.password-box button:active {
+  transform: scale(0.98);
 }
 
 .error-msg {
-  color: #e74c3c;
+  color: hsl(0, 72%, 60%);
   margin-top: 12px;
   font-size: 14px;
+  font-weight: 500;
 }
 
 /* ========== 主内容 ========== */
 .main-content {
   max-width: 900px;
   margin: 0 auto;
-  padding: 20px;
+  padding: 24px 24px 0;
 }
 
+/* ========== 顶部 ========== */
 .header {
   text-align: center;
-  padding: 40px 0 60px;
+  padding: 48px 0 64px;
 }
 
 .header h1 {
-  color: #e8b849;
-  font-size: 32px;
+  color: var(--gold-300);
+  font-size: 36px;
+  font-weight: 700;
   margin-bottom: 8px;
+  letter-spacing: -0.02em;
 }
 
 .subtitle {
-  color: #888;
+  color: var(--text-secondary);
   font-size: 16px;
+  font-weight: 400;
+  /* 下方加装饰线 */
+  display: inline-block;
+  padding-bottom: 16px;
+  border-bottom: 2px solid var(--gold-500);
 }
 
 /* ========== 时间线 ========== */
 .timeline {
   position: relative;
-  padding: 20px 0;
+  padding: 32px 0;
 }
 
 .timeline::before {
@@ -131,7 +217,13 @@ body {
   top: 0;
   bottom: 0;
   width: 2px;
-  background: linear-gradient(to bottom, transparent, #e8b849, transparent);
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    var(--gold-500) 10%,
+    var(--gold-500) 90%,
+    transparent
+  );
   transform: translateX(-50%);
 }
 
@@ -140,18 +232,26 @@ body {
   position: relative;
   width: 45%;
   padding: 24px;
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--bg-card);
   border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  margin-bottom: 40px;
+  border: 1px solid hsla(230, 15%, 100%, 0.06);
+  margin-bottom: 48px;
   opacity: 0;
-  transform: translateY(30px);
+  transform: translateY(32px);
   transition: opacity 0.6s ease, transform 0.6s ease;
+  box-shadow: var(--shadow-sm);
+  /* 顶部金色强调线 */
+  border-top: 2px solid var(--gold-500);
 }
 
 .event-card.visible {
   opacity: 1;
   transform: translateY(0);
+}
+
+.event-card:hover {
+  box-shadow: var(--shadow-md);
+  border-color: hsla(230, 15%, 100%, 0.1);
 }
 
 /* 左右交替 */
@@ -168,20 +268,22 @@ body {
   content: "";
   position: absolute;
   top: 30px;
-  width: 12px;
-  height: 12px;
-  background: #e8b849;
+  width: 14px;
+  height: 14px;
+  background: var(--gold-400);
+  border: 3px solid var(--bg-primary);
   border-radius: 50%;
   z-index: 1;
+  box-shadow: 0 0 0 2px var(--gold-500);
 }
 
 .event-card:nth-child(odd)::before {
-  right: -6%;
+  right: -7%;
   transform: translateX(50%);
 }
 
 .event-card:nth-child(even)::before {
-  left: -6%;
+  left: -7%;
   transform: translateX(-50%);
 }
 
@@ -192,7 +294,8 @@ body {
   top: 35px;
   width: 5%;
   height: 2px;
-  background: rgba(232, 184, 73, 0.3);
+  background: var(--gold-500);
+  opacity: 0.4;
 }
 
 .event-card:nth-child(odd)::after {
@@ -203,24 +306,29 @@ body {
   left: -5%;
 }
 
+/* ========== 卡片内容 ========== */
 .event-date {
   display: inline-block;
-  background: rgba(232, 184, 73, 0.15);
-  color: #e8b849;
+  background: hsla(42, 76%, 48%, 0.1);
+  color: var(--gold-300);
   padding: 4px 12px;
   border-radius: 20px;
   font-size: 13px;
+  font-weight: 500;
   margin-bottom: 12px;
+  letter-spacing: 0.02em;
 }
 
 .event-title {
   font-size: 20px;
-  color: #fff;
+  font-weight: 600;
+  color: var(--text-primary);
   margin-bottom: 8px;
+  letter-spacing: -0.01em;
 }
 
 .event-desc {
-  color: #aaa;
+  color: var(--text-secondary);
   font-size: 14px;
   line-height: 1.6;
   margin-bottom: 16px;
@@ -239,12 +347,13 @@ body {
   object-fit: cover;
   border-radius: 8px;
   cursor: pointer;
-  transition: transform 0.3s, box-shadow 0.3s;
+  transition: transform 0.2s, box-shadow 0.2s;
+  box-shadow: var(--shadow-sm);
 }
 
 .photo-grid img:hover {
   transform: scale(1.05);
-  box-shadow: 0 4px 15px rgba(232, 184, 73, 0.3);
+  box-shadow: var(--shadow-md), 0 0 0 2px var(--gold-500);
 }
 
 /* ========== 视频按钮 ========== */
@@ -253,17 +362,20 @@ body {
   align-items: center;
   gap: 8px;
   padding: 8px 16px;
-  background: rgba(232, 184, 73, 0.15);
-  color: #e8b849;
+  background: hsla(42, 76%, 48%, 0.1);
+  color: var(--gold-300);
+  border: 1px solid hsla(42, 76%, 48%, 0.2);
   border-radius: 8px;
   text-decoration: none;
   font-size: 14px;
+  font-weight: 500;
   margin-top: 12px;
-  transition: background 0.3s;
+  transition: background 0.2s, border-color 0.2s;
 }
 
 .video-link:hover {
-  background: rgba(232, 184, 73, 0.3);
+  background: hsla(42, 76%, 48%, 0.2);
+  border-color: hsla(42, 76%, 48%, 0.4);
 }
 
 /* ========== 灯箱 ========== */
@@ -273,7 +385,8 @@ body {
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.95);
+  background: hsla(240, 20%, 6%, 0.95);
+  backdrop-filter: blur(8px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -285,18 +398,30 @@ body {
   max-height: 90vh;
   object-fit: contain;
   border-radius: 8px;
+  box-shadow: var(--shadow-xl);
 }
 
 .lightbox-close {
   position: absolute;
-  top: 20px;
-  right: 20px;
-  background: none;
-  border: none;
-  color: #fff;
-  font-size: 32px;
+  top: 24px;
+  right: 24px;
+  background: hsla(230, 15%, 100%, 0.1);
+  border: 1px solid hsla(230, 15%, 100%, 0.15);
+  color: var(--text-primary);
+  font-size: 24px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
   cursor: pointer;
   z-index: 2001;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+}
+
+.lightbox-close:hover {
+  background: hsla(230, 15%, 100%, 0.2);
 }
 
 .lightbox-prev,
@@ -304,51 +429,77 @@ body {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  background: rgba(255, 255, 255, 0.1);
-  border: none;
-  color: #fff;
-  font-size: 24px;
-  padding: 16px;
+  background: hsla(230, 15%, 100%, 0.1);
+  border: 1px solid hsla(230, 15%, 100%, 0.15);
+  color: var(--text-primary);
+  font-size: 20px;
+  width: 48px;
+  height: 48px;
   cursor: pointer;
   border-radius: 50%;
-  transition: background 0.3s;
+  transition: background 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.lightbox-prev { left: 20px; }
-.lightbox-next { right: 20px; }
+.lightbox-prev { left: 24px; }
+.lightbox-next { right: 24px; }
 
 .lightbox-prev:hover,
 .lightbox-next:hover {
-  background: rgba(255, 255, 255, 0.2);
+  background: hsla(230, 15%, 100%, 0.2);
 }
 
 /* ========== 底部 ========== */
 .footer {
   text-align: center;
-  padding: 60px 0 40px;
-  color: #666;
+  padding: 96px 0 48px;
+  color: var(--text-tertiary);
+  font-size: 14px;
 }
 
 .qrcode {
   width: 150px;
   margin-top: 16px;
-  border-radius: 8px;
-  border: 2px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  border: 2px solid hsla(230, 15%, 100%, 0.08);
+  box-shadow: var(--shadow-md);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.qrcode:hover {
+  transform: scale(1.05);
+  box-shadow: var(--shadow-lg);
+}
+
+/* ========== 空状态 ========== */
+.timeline:empty::after {
+  content: "还没有添加事件，运行 add_event.py 开始添加";
+  display: block;
+  text-align: center;
+  padding: 64px 24px;
+  color: var(--text-tertiary);
+  font-size: 16px;
+  border: 2px dashed hsla(230, 15%, 100%, 0.1);
+  border-radius: 12px;
+  margin: 0 5%;
 }
 
 /* ========== 响应式 - 手机端 ========== */
 @media (max-width: 768px) {
   .timeline::before {
-    left: 20px;
+    left: 24px;
   }
 
   .event-card {
-    width: calc(100% - 50px);
-    margin-left: 50px !important;
+    width: calc(100% - 56px);
+    margin-left: 56px !important;
+    padding: 20px;
   }
 
   .event-card::before {
-    left: -36px !important;
+    left: -38px !important;
     right: auto !important;
     transform: none !important;
   }
@@ -357,6 +508,10 @@ body {
     left: -20px !important;
     right: auto !important;
     width: 20px !important;
+  }
+
+  .header {
+    padding: 32px 0 48px;
   }
 
   .header h1 {
@@ -369,5 +524,9 @@ body {
 
   .photo-grid img {
     height: 80px;
+  }
+
+  .timeline:empty::after {
+    margin: 0;
   }
 }
