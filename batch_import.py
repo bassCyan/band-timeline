@@ -56,8 +56,8 @@ def compress_image(src_path, dst_path, max_width=1920, quality=85):
 
 
 def parse_folder_name(name):
-    """从文件夹名解析日期和事件名称，格式: YYYY-MM-DD 事件名称"""
-    match = re.match(r"(\d{4}-\d{2}-\d{2})\s+(.+)", name)
+    """从文件夹名解析日期和事件名称，支持: YYYY-MM-DD 事件名称 或 YYYY-MM-DD-事件名称"""
+    match = re.match(r"(\d{4}-\d{2}-\d{2})[\s-]+(.+)", name)
     if match:
         return match.group(1), match.group(2)
     return None, name
@@ -102,7 +102,7 @@ def process_event_folder(folder_path, existing_dates):
         else:
             shutil.copy2(str(photo_file), dst_path)
 
-        photos.append(f"{dst_folder}/{dst_name}")
+        photos.append(f"{dst_folder}/{dst_name}".replace("\\", "/"))
 
     # 检查 video.txt
     video = None

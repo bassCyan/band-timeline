@@ -1,5 +1,210 @@
 {
   "band_name": "我们的乐队",
   "password": "band2024",
-  "events": []
+  "events": [
+    {
+      "date": "2026-03-02",
+      "title": "招聘会演出排练",
+      "description": null,
+      "photos": [
+        "images/2026-03-02-招聘会演出排练/1.jpg"
+      ],
+      "video": null
+    },
+    {
+      "date": "2025-11-08",
+      "title": "音乐厅演出",
+      "description": null,
+      "photos": [
+        "images/2025-11-08-音乐厅演出/1.jpg"
+      ],
+      "video": null
+    },
+    {
+      "date": "2025-10-12",
+      "title": "广大演出",
+      "description": null,
+      "photos": [
+        "images/2025-10-12-广大演出/1.jpg"
+      ],
+      "video": null
+    },
+    {
+      "date": "2025-07-06",
+      "title": "芸溪音乐剧",
+      "description": null,
+      "photos": [
+        "images/2025-07-06-芸溪音乐剧/1.jpg"
+      ],
+      "video": null
+    },
+    {
+      "date": "2025-07-02",
+      "title": "剧本杀",
+      "description": null,
+      "photos": [
+        "images/2025-07-02-剧本杀/1.jpg"
+      ],
+      "video": null
+    },
+    {
+      "date": "2025-05-17",
+      "title": "三院汇演",
+      "description": null,
+      "photos": [
+        "images/2025-05-17-三院汇演/1.jpg"
+      ],
+      "video": null
+    },
+    {
+      "date": "2025-05-15",
+      "title": "十人合影",
+      "description": null,
+      "photos": [
+        "images/2025-05-15-十人合影/1.jpg"
+      ],
+      "video": null
+    },
+    {
+      "date": "2025-04-24",
+      "title": "七里香演出",
+      "description": null,
+      "photos": [
+        "images/2025-04-24-七里香演出/1.jpg"
+      ],
+      "video": null
+    },
+    {
+      "date": "2025-04-23",
+      "title": "SCN-One集合",
+      "description": null,
+      "photos": [
+        "images/2025-04-23-SCN-One集合/1.jpg"
+      ],
+      "video": null
+    },
+    {
+      "date": "2025-03-29",
+      "title": "爱乐烧烤",
+      "description": null,
+      "photos": [
+        "images/2025-03-29-爱乐烧烤/1.jpg"
+      ],
+      "video": null
+    },
+    {
+      "date": "2024-12-28",
+      "title": "录音",
+      "description": null,
+      "photos": [
+        "images/2024-12-28-录音/1.png"
+      ],
+      "video": null
+    },
+    {
+      "date": "2024-12-09",
+      "title": "歌手大赛",
+      "description": null,
+      "photos": [
+        "images/2024-12-09-歌手大赛/1.jpg",
+        "images/2024-12-09-歌手大赛/2.jpg"
+      ],
+      "video": null
+    },
+    {
+      "date": "2024-11-27",
+      "title": "冬日路演",
+      "description": null,
+      "photos": [
+        "images/2024-11-27-冬日路演/1.jpg"
+      ],
+      "video": null
+    },
+    {
+      "date": "2024-11-16",
+      "title": "冲刺1km",
+      "description": null,
+      "photos": [
+        "images/2024-11-16-冲刺1km/1.jpg"
+      ],
+      "video": null
+    },
+    {
+      "date": "2024-11-09",
+      "title": "法院院运会",
+      "description": null,
+      "photos": [
+        "images/2024-11-09-法院院运会/1.jpg"
+      ],
+      "video": null
+    },
+    {
+      "date": "2024-10-25",
+      "title": "旅管迎新",
+      "description": null,
+      "photos": [
+        "images/2024-10-25-旅管迎新/1.jpg"
+      ],
+      "video": null
+    },
+    {
+      "date": "2024-10-24",
+      "title": "爱乐破冰",
+      "description": null,
+      "photos": [
+        "images/2024-10-24-爱乐破冰/1.jpg"
+      ],
+      "video": null
+    },
+    {
+      "date": "2024-10-20",
+      "title": "物理迎新演出",
+      "description": null,
+      "photos": [
+        "images/2024-10-20-物理迎新演出/1.jpg",
+        "images/2024-10-20-物理迎新演出/2.jpg"
+      ],
+      "video": null
+    },
+    {
+      "date": "2024-04-12",
+      "title": "草地音乐节",
+      "description": null,
+      "photos": [
+        "images/2024-04-12-草地音乐节/1.jpg",
+        "images/2024-04-12-草地音乐节/2.jpg",
+        "images/2024-04-12-草地音乐节/3.jpg"
+      ],
+      "video": null
+    },
+    {
+      "date": "2023-11-11",
+      "title": "经管嘉年华",
+      "description": null,
+      "photos": [
+        "images/2023-11-11-经管嘉年华/1.jpg"
+      ],
+      "video": null
+    },
+    {
+      "date": "2023-10-22",
+      "title": "物理学院迎新晚会",
+      "description": null,
+      "photos": [
+        "images/2023-10-22-物理学院迎新晚会/1.jpg"
+      ],
+      "video": null
+    },
+    {
+      "date": "2022-01-01",
+      "title": "最早的一批照片",
+      "description": null,
+      "photos": [
+        "images/2022-01-01-最早的一批照片/1.jpg",
+        "images/2022-01-01-最早的一批照片/2.jpg",
+        "images/2022-01-01-最早的一批照片/3.jpg"
+      ],
+      "video": null
+    }
+  ]
 }
