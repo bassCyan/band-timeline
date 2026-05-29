@@ -2,7 +2,6 @@
 let bandData = null;
 let currentLightboxPhotos = [];
 let currentLightboxIndex = 0;
-let scrollObserver = null;
 
 // ========== 初始化 ==========
 document.addEventListener("DOMContentLoaded", async () => {
@@ -11,25 +10,18 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
     bandData = await response.json();
   } catch (e) {
-    showLoadingError();
+    document.getElementById("password-gate").querySelector(".password-box").innerHTML =
+      '<h1 class="band-logo">✦</h1><h2>加载失败</h2><p>请刷新页面重试</p>';
     return;
   }
 
-  const savedPassword = localStorage.getItem("band_password");
-  if (savedPassword === bandData.password) {
+  const saved = localStorage.getItem("band_password");
+  if (saved === bandData.password) {
     showMainContent();
   } else {
     setupPasswordGate();
   }
 });
-
-function showLoadingError() {
-  const gate = document.getElementById("password-gate");
-  if (gate) {
-    const box = gate.querySelector(".password-box");
-    if (box) box.innerHTML = '<h1 class="band-logo">✦</h1><h2>加载失败</h2><p>请刷新页面重试</p>';
-  }
-}
 
 // ========== 密码门 ==========
 function setupPasswordGate() {
@@ -63,298 +55,227 @@ function showMainContent() {
 }
 
 // ========== 工具函数 ==========
-function escapeHtml(str) {
-  const div = document.createElement("div");
-  div.textContent = str;
-  return div.innerHTML;
+function esc(str) {
+  const d = document.createElement("div");
+  d.textContent = str;
+  return d.innerHTML;
 }
 
-function escapeAttr(str) {
-  return str.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/'/g, "&#39;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+function getThumb(p) {
+  return p.replace("images/", "images/thumbs/");
 }
 
-function formatDate(dateStr) {
-  const parts = dateStr.split("-");
-  return parts.length === 3 ? `${parts[0]}.${parts[1]}.${parts[2]}` : dateStr;
+function fmtDate(s) {
+  const p = s.split("-");
+  return p.length === 3 ? `${p[0]}.${p[1]}.${p[2]}` : s;
 }
 
-function getThumbPath(photoPath) {
-  return photoPath.replace("images/", "images/thumbs/");
-}
-
-function getSemesterEmoji(sem) {
-  if (sem.includes("春")) return "🌱";
-  if (sem.includes("秋")) return "🍂";
+function semEmoji(s) {
+  if (s.includes("春")) return "🌱";
+  if (s.includes("秋")) return "🍂";
   return "📷";
 }
 
-function getSemesterCover(sem) {
-  // 取第一张照片作为封面
-  for (const event of sem.events) {
-    if (event.photos && event.photos.length > 0) return event.photos[0];
+// ========== 评论系统 ==========
+function getComments(key) {
+  return JSON.parse(localStorage.getItem("band_comments") || "{}")[key] || [];
+}
+
+function saveComment(key, name, text) {
+  const all = JSON.parse(localStorage.getItem("band_comments") || "{}");
+  if (!all[key]) all[key] = [];
+  all[key].push({ name, text, time: new Date().toLocaleString("zh-CN") });
+  localStorage.setItem("band_comments", JSON.stringify(all));
+}
+
+function buildCommentsHTML(eventKey) {
+  const comments = getComments(eventKey);
+  let h = `<div class="comments-section">`;
+  h += `<h4 class="comments-title">💬 留言 (${comments.length})</h4>`;
+  if (comments.length > 0) {
+    h += `<div class="comments-list">`;
+    comments.forEach(c => {
+      h += `<div class="comment-item">
+        <div class="comment-header"><span class="comment-name">${esc(c.name)}</span><span class="comment-time">${esc(c.time)}</span></div>
+        <p class="comment-text">${esc(c.text)}</p>
+      </div>`;
+    });
+    h += `</div>`;
+  }
+  h += `<div class="comment-form" data-key="${esc(eventKey)}">
+    <input type="text" class="comment-name-input" placeholder="你的名字" maxlength="20">
+    <textarea class="comment-text-input" placeholder="写点什么吧..." maxlength="500" rows="2"></textarea>
+    <button class="comment-submit">留言</button>
+  </div></div>`;
+  return h;
+}
+
+function setupCommentForms() {
+  document.querySelectorAll(".comment-submit").forEach(btn => {
+    btn.addEventListener("click", function() {
+      const form = this.closest(".comment-form");
+      const key = form.dataset.key;
+      const name = form.querySelector(".comment-name-input").value.trim() || "匿名";
+      const text = form.querySelector(".comment-text-input").value.trim();
+      if (!text) { form.querySelector(".comment-text-input").focus(); return; }
+      saveComment(key, name, text);
+      // 重新渲染整个事件卡片
+      const card = this.closest(".event-card-detail");
+      const event = findEventByKey(key);
+      if (event) {
+        card.outerHTML = buildEventCardHTML(event);
+        setupCommentForms();
+      }
+    });
+  });
+}
+
+function findEventByKey(key) {
+  for (const sem of bandData.semesters) {
+    for (const ev of sem.events) {
+      if (`${ev.date}-${ev.title}` === key) return ev;
+    }
   }
   return null;
 }
 
-// ========== 评论系统（localStorage） ==========
-function getComments(eventKey) {
-  const all = JSON.parse(localStorage.getItem("band_comments") || "{}");
-  return all[eventKey] || [];
-}
-
-function addComment(eventKey, name, text) {
-  const all = JSON.parse(localStorage.getItem("band_comments") || "{}");
-  if (!all[eventKey]) all[eventKey] = [];
-  all[eventKey].push({
-    name: name,
-    text: text,
-    time: new Date().toLocaleString("zh-CN"),
-  });
-  localStorage.setItem("band_comments", JSON.stringify(all));
-}
-
-function renderComments(eventKey, container) {
-  const comments = getComments(eventKey);
-  let html = '<div class="comments-section">';
-  html += `<h4 class="comments-title">留言 (${comments.length})</h4>`;
-
-  if (comments.length > 0) {
-    html += '<div class="comments-list">';
-    comments.forEach((c) => {
-      html += `
-        <div class="comment-item">
-          <div class="comment-header">
-            <span class="comment-name">${escapeHtml(c.name)}</span>
-            <span class="comment-time">${escapeHtml(c.time)}</span>
-          </div>
-          <p class="comment-text">${escapeHtml(c.text)}</p>
-        </div>
-      `;
-    });
-    html += "</div>";
-  }
-
-  html += `
-    <div class="comment-form">
-      <input type="text" class="comment-name-input" placeholder="你的名字" maxlength="20">
-      <textarea class="comment-text-input" placeholder="写点什么吧..." maxlength="500" rows="2"></textarea>
-      <button class="comment-submit" onclick="submitComment('${escapeAttr(eventKey)}', this)">留言</button>
-    </div>
-  `;
-  html += "</div>";
-  container.innerHTML += html;
-}
-
-function submitComment(eventKey, btn) {
-  const form = btn.closest(".comment-form");
-  const nameInput = form.querySelector(".comment-name-input");
-  const textInput = form.querySelector(".comment-text-input");
-  const name = nameInput.value.trim() || "匿名";
-  const text = textInput.value.trim();
-
-  if (!text) {
-    textInput.focus();
-    return;
-  }
-
-  addComment(eventKey, name, text);
-  nameInput.value = "";
-  textInput.value = "";
-
-  // 重新渲染评论
-  const section = btn.closest(".comments-section");
-  const eventCard = btn.closest(".event-card-detail");
-  const eventContent = eventCard.parentElement;
-  const event = bandData.semesters
-    .flatMap((s) => s.events)
-    .find((e) => `${e.date}-${e.title}` === eventKey);
-
-  if (event) {
-    const tempDiv = document.createElement("div");
-    renderComments(eventKey, tempDiv);
-    section.outerHTML = tempDiv.innerHTML;
-  }
-}
-
 // ========== 往年今日 ==========
 function renderOnThisDay() {
-  const container = document.getElementById("on-this-day");
-  if (!container) return;
-
-  const today = new Date();
-  const month = String(today.getMonth() + 1).padStart(2, "0");
-  const day = String(today.getDate()).padStart(2, "0");
-  const todayKey = `${month}-${day}`;
-
-  const matches = [];
-  bandData.semesters.forEach((sem) => {
-    sem.events.forEach((event) => {
-      const parts = event.date.split("-");
-      if (parts.length === 3 && `${parts[1]}-${parts[2]}` === todayKey && event.photos && event.photos.length > 0) {
-        matches.push(event);
-      }
-    });
+  const el = document.getElementById("on-this-day");
+  if (!el) return;
+  const now = new Date();
+  const mm = String(now.getMonth() + 1).padStart(2, "0");
+  const dd = String(now.getDate()).padStart(2, "0");
+  const today = `${mm}-${dd}`;
+  const hits = [];
+  bandData.semesters.forEach(s => s.events.forEach(e => {
+    const p = e.date.split("-");
+    if (p.length === 3 && `${p[1]}-${p[2]}` === today && e.photos?.length) hits.push(e);
+  }));
+  if (!hits.length) { el.style.display = "none"; return; }
+  el.style.display = "block";
+  let h = `<h2 class="section-title">📅 往年今日</h2><div class="otd-grid">`;
+  hits.forEach(e => {
+    h += `<div class="otd-card" onclick="openOtdLightbox(this)">
+      <img src="${getThumb(e.photos[0])}" data-full="${e.photos[0]}" alt="${esc(e.title)}">
+      <div class="otd-info"><span class="otd-year">${e.date.split("-")[0]}</span><span class="otd-title">${esc(e.title)}</span></div>
+    </div>`;
   });
-
-  if (matches.length === 0) { container.style.display = "none"; return; }
-
-  container.style.display = "block";
-  let html = '<h2 class="section-title">📅 往年今日</h2><div class="otd-grid">';
-  matches.forEach((event) => {
-    const year = event.date.split("-")[0];
-    html += `
-      <div class="otd-card">
-        <img src="${escapeAttr(getThumbPath(event.photos[0]))}" data-full="${escapeAttr(event.photos[0])}" alt="${escapeAttr(event.title)}" onclick="openLightboxFromOtd(this)">
-        <div class="otd-info">
-          <span class="otd-year">${year}</span>
-          <span class="otd-title">${escapeHtml(event.title)}</span>
-        </div>
-      </div>
-    `;
-  });
-  html += "</div>";
-  container.innerHTML = html;
+  h += `</div>`;
+  el.innerHTML = h;
 }
 
 // ========== 学期相册 ==========
 function renderAlbums() {
-  const list = document.getElementById("album-list");
-  if (!list) return;
-
-  if (!bandData.semesters || bandData.semesters.length === 0) {
-    list.innerHTML = '<div class="empty-state">还没有添加事件</div>';
-    return;
-  }
-
-  let html = "";
-  bandData.semesters.forEach((sem, index) => {
-    const cover = getSemesterCover(sem);
-    const coverThumb = cover ? getThumbPath(cover) : "";
-    const totalPhotos = sem.events.reduce((sum, e) => sum + (e.photos ? e.photos.length : 0), 0);
-    const emoji = getSemesterEmoji(sem.semester);
-
-    html += `
-      <div class="album-card" onclick="showSemester(${index})">
-        <div class="album-cover" ${cover ? `style="background-image: url('${escapeAttr(coverThumb)}')"` : ""}>
-          ${!cover ? `<span class="album-emoji">${emoji}</span>` : ""}
-        </div>
-        <div class="album-info">
-          <h3 class="album-title">${emoji} ${escapeHtml(sem.semester)}</h3>
-          <p class="album-meta">${sem.events.length} 个事件 · ${totalPhotos} 张照片</p>
-        </div>
+  const el = document.getElementById("album-list");
+  if (!el) return;
+  if (!bandData.semesters?.length) { el.innerHTML = '<div class="empty-state">还没有添加事件</div>'; return; }
+  let h = "";
+  bandData.semesters.forEach((s, i) => {
+    const cover = s.events[0]?.photos?.[0];
+    const total = s.events.reduce((n, e) => n + (e.photos?.length || 0), 0);
+    h += `<div class="album-card" data-idx="${i}">
+      <div class="album-cover" ${cover ? `style="background-image:url('${getThumb(cover)}')"` : ""}>
+        ${!cover ? `<span class="album-emoji">${semEmoji(s.semester)}</span>` : ""}
       </div>
-    `;
+      <div class="album-info">
+        <h3 class="album-title">${semEmoji(s.semester)} ${esc(s.semester)}</h3>
+        <p class="album-meta">${s.events.length} 个事件 · ${total} 张照片</p>
+      </div>
+    </div>`;
   });
-  list.innerHTML = html;
-
-  // 滚动动画
-  setupScrollAnimation();
+  el.innerHTML = h;
+  // 点击事件
+  el.querySelectorAll(".album-card").forEach(card => {
+    card.addEventListener("click", () => showSemester(parseInt(card.dataset.idx)));
+  });
+  // 动画
+  requestAnimationFrame(() => {
+    el.querySelectorAll(".album-card").forEach((c, i) => {
+      setTimeout(() => c.classList.add("visible"), i * 80);
+    });
+  });
 }
 
-function showSemester(index) {
-  const sem = bandData.semesters[index];
+function showSemester(idx) {
+  const sem = bandData.semesters[idx];
   if (!sem) return;
-
   document.getElementById("album-list").style.display = "none";
   document.getElementById("on-this-day").style.display = "none";
   document.getElementById("random-btn").style.display = "none";
   const detail = document.getElementById("event-detail");
   detail.style.display = "block";
-
-  let html = `<h2 class="semester-title">${getSemesterEmoji(sem.semester)} ${escapeHtml(sem.semester)}</h2>`;
-
-  sem.events.forEach((event) => {
-    const eventKey = `${event.date}-${event.title}`;
-    html += `<div class="event-card-detail">`;
-    html += `<span class="event-date">${formatDate(event.date)}</span>`;
-    html += `<h3 class="event-title">${escapeHtml(event.title)}</h3>`;
-
-    if (event.photos && event.photos.length > 0) {
-      html += '<div class="photo-grid">';
-      event.photos.forEach((photo, i) => {
-        html += `<img src="${escapeAttr(getThumbPath(photo))}" data-full="${escapeAttr(photo)}" loading="lazy" data-index="${i}" onclick="openLightbox(this)">`;
-      });
-      html += "</div>";
-    }
-
-    html += "</div>";
-
-    // 评论区
-    const commentDiv = document.createElement("div");
-    renderComments(eventKey, commentDiv);
-    html += commentDiv.innerHTML;
-  });
-
-  document.getElementById("event-content").innerHTML = html;
+  let h = `<h2 class="semester-title">${semEmoji(sem.semester)} ${esc(sem.semester)}</h2>`;
+  sem.events.forEach(ev => { h += buildEventCardHTML(ev); });
+  document.getElementById("event-content").innerHTML = h;
+  setupCommentForms();
   window.scrollTo(0, 0);
+}
+
+function buildEventCardHTML(ev) {
+  const key = `${ev.date}-${ev.title}`;
+  let h = `<div class="event-card-detail">`;
+  h += `<span class="event-date">${fmtDate(ev.date)}</span>`;
+  h += `<h3 class="event-title">${esc(ev.title)}</h3>`;
+  if (ev.photos?.length) {
+    h += `<div class="photo-grid">`;
+    ev.photos.forEach((p, i) => {
+      h += `<img src="${getThumb(p)}" data-full="${p}" data-index="${i}" loading="lazy">`;
+    });
+    h += `</div>`;
+  }
+  h += buildCommentsHTML(key);
+  h += `</div>`;
+  return h;
 }
 
 function setupBackButton() {
   const btn = document.getElementById("back-btn");
-  if (btn) {
-    btn.addEventListener("click", () => {
-      document.getElementById("event-detail").style.display = "none";
-      document.getElementById("album-list").style.display = "grid";
-      document.getElementById("on-this-day").style.display = "";
-      document.getElementById("random-btn").style.display = "";
-      // 恢复往年今日显示
-      renderOnThisDay();
-    });
-  }
-}
-
-// ========== 滚动动画 ==========
-function setupScrollAnimation() {
-  if (scrollObserver) scrollObserver.disconnect();
-  scrollObserver = new IntersectionObserver(
-    (entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add("visible");
-          scrollObserver.unobserve(entry.target);
-        }
-      });
-    },
-    { threshold: 0.1 }
-  );
-  document.querySelectorAll(".album-card, .event-card-detail").forEach((el) => {
-    scrollObserver.observe(el);
+  if (!btn) return;
+  btn.addEventListener("click", () => {
+    document.getElementById("event-detail").style.display = "none";
+    document.getElementById("album-list").style.display = "grid";
+    document.getElementById("random-btn").style.display = "";
+    renderOnThisDay();
   });
 }
 
 // ========== 灯箱 ==========
 function setupLightbox() {
-  const lightbox = document.getElementById("lightbox");
+  const lb = document.getElementById("lightbox");
   document.getElementById("lightbox-close").addEventListener("click", closeLightbox);
-  document.getElementById("lightbox-prev").addEventListener("click", () => navigateLightbox(-1));
-  document.getElementById("lightbox-next").addEventListener("click", () => navigateLightbox(1));
-  lightbox.addEventListener("click", (e) => { if (e.target === lightbox) closeLightbox(); });
-  document.addEventListener("keydown", (e) => {
-    if (lightbox.style.display === "none") return;
+  document.getElementById("lightbox-prev").addEventListener("click", () => nav(-1));
+  document.getElementById("lightbox-next").addEventListener("click", () => nav(1));
+  lb.addEventListener("click", e => { if (e.target === lb) closeLightbox(); });
+  document.addEventListener("keydown", e => {
+    if (lb.style.display === "none") return;
     if (e.key === "Escape") closeLightbox();
-    if (e.key === "ArrowLeft") navigateLightbox(-1);
-    if (e.key === "ArrowRight") navigateLightbox(1);
+    if (e.key === "ArrowLeft") nav(-1);
+    if (e.key === "ArrowRight") nav(1);
+  });
+  // 委托点击事件（支持动态生成的照片）
+  document.addEventListener("click", e => {
+    const img = e.target.closest(".photo-grid img");
+    if (img) openLightbox(img);
   });
 }
 
-function openLightbox(imgElement) {
-  const container = imgElement.closest(".photo-grid") || imgElement.closest(".otd-grid");
-  const photos = Array.from(container.querySelectorAll("img")).map((img) => img.dataset.full || img.src);
-  const index = parseInt(imgElement.dataset.index, 10) || 0;
-  currentLightboxPhotos = photos;
-  currentLightboxIndex = index;
-  document.getElementById("lightbox-img").src = photos[index];
-  document.getElementById("lightbox").style.display = "flex";
-  document.body.style.overflow = "hidden";
+function openLightbox(img) {
+  const grid = img.closest(".photo-grid");
+  currentLightboxPhotos = Array.from(grid.querySelectorAll("img")).map(i => i.dataset.full);
+  currentLightboxIndex = parseInt(img.dataset.index) || 0;
+  showLightbox();
 }
 
-function openLightboxFromOtd(imgElement) {
-  const grid = imgElement.closest(".otd-grid");
-  const photos = Array.from(grid.querySelectorAll("img")).map((img) => img.dataset.full || img.src);
-  const index = Array.from(grid.querySelectorAll(".otd-card")).indexOf(imgElement.closest(".otd-card"));
-  currentLightboxPhotos = photos;
-  currentLightboxIndex = index;
-  document.getElementById("lightbox-img").src = photos[index];
+function openOtdLightbox(card) {
+  const grid = card.closest(".otd-grid");
+  currentLightboxPhotos = Array.from(grid.querySelectorAll("img")).map(i => i.dataset.full);
+  currentLightboxIndex = Array.from(grid.children).indexOf(card);
+  showLightbox();
+}
+
+function showLightbox() {
+  document.getElementById("lightbox-img").src = currentLightboxPhotos[currentLightboxIndex];
   document.getElementById("lightbox").style.display = "flex";
   document.body.style.overflow = "hidden";
 }
@@ -364,28 +285,19 @@ function closeLightbox() {
   document.body.style.overflow = "";
 }
 
-function navigateLightbox(direction) {
-  currentLightboxIndex = (currentLightboxIndex + direction + currentLightboxPhotos.length) % currentLightboxPhotos.length;
+function nav(d) {
+  currentLightboxIndex = (currentLightboxIndex + d + currentLightboxPhotos.length) % currentLightboxPhotos.length;
   document.getElementById("lightbox-img").src = currentLightboxPhotos[currentLightboxIndex];
 }
 
 // ========== 随机回忆 ==========
 function setupRandomButton() {
-  const btn = document.getElementById("random-btn");
-  if (!btn) return;
-  btn.addEventListener("click", () => {
-    const allPhotos = [];
-    bandData.semesters.forEach((sem) => {
-      sem.events.forEach((event) => {
-        if (event.photos) event.photos.forEach((p) => allPhotos.push(p));
-      });
-    });
-    if (allPhotos.length === 0) return;
-    const pick = allPhotos[Math.floor(Math.random() * allPhotos.length)];
-    currentLightboxPhotos = allPhotos;
-    currentLightboxIndex = allPhotos.indexOf(pick);
-    document.getElementById("lightbox-img").src = pick;
-    document.getElementById("lightbox").style.display = "flex";
-    document.body.style.overflow = "hidden";
+  document.getElementById("random-btn")?.addEventListener("click", () => {
+    const all = [];
+    bandData.semesters.forEach(s => s.events.forEach(e => e.photos?.forEach(p => all.push(p))));
+    if (!all.length) return;
+    currentLightboxPhotos = all;
+    currentLightboxIndex = Math.floor(Math.random() * all.length);
+    showLightbox();
   });
 }
