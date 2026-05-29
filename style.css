@@ -112,6 +112,7 @@ body {
 .band-logo {
   font-size: 56px;
   margin-bottom: 16px;
+  color: var(--gold-400);
   filter: drop-shadow(0 4px 16px hsla(42, 76%, 48%, 0.3));
   animation: float 3s ease-in-out infinite;
 }
@@ -678,11 +679,11 @@ body {
 }
 
 .empty-state::before {
-  content: "🎸";
+  content: "✦";
   display: block;
   font-size: 48px;
   margin-bottom: 16px;
-  filter: grayscale(0.3);
+  color: var(--gold-400);
 }
 
 /* ========== 响应式 - 手机端 ========== */
