@@ -1,3 +1,7 @@
+// ========== 配置 ==========
+// 部署 Twikoo 后，把 Vercel 的 URL 填到这里
+const TWIKOO_ENV_ID = "YOUR_VERCEL_URL";
+
 // ========== 全局状态 ==========
 let bandData = null;
 let currentLightboxPhotos = [];
@@ -76,67 +80,19 @@ function semEmoji(s) {
   return "📷";
 }
 
-// ========== 评论系统 ==========
-function getComments(key) {
-  return JSON.parse(localStorage.getItem("band_comments") || "{}")[key] || [];
+function eventKey(ev) {
+  return `${ev.date}-${ev.title}`.replace(/[^a-zA-Z0-9一-龥\-]/g, "_");
 }
 
-function saveComment(key, name, text) {
-  const all = JSON.parse(localStorage.getItem("band_comments") || "{}");
-  if (!all[key]) all[key] = [];
-  all[key].push({ name, text, time: new Date().toLocaleString("zh-CN") });
-  localStorage.setItem("band_comments", JSON.stringify(all));
-}
-
-function buildCommentsHTML(eventKey) {
-  const comments = getComments(eventKey);
-  let h = `<div class="comments-section">`;
-  h += `<h4 class="comments-title">💬 留言 (${comments.length})</h4>`;
-  if (comments.length > 0) {
-    h += `<div class="comments-list">`;
-    comments.forEach(c => {
-      h += `<div class="comment-item">
-        <div class="comment-header"><span class="comment-name">${esc(c.name)}</span><span class="comment-time">${esc(c.time)}</span></div>
-        <p class="comment-text">${esc(c.text)}</p>
-      </div>`;
-    });
-    h += `</div>`;
-  }
-  h += `<div class="comment-form" data-key="${esc(eventKey)}">
-    <input type="text" class="comment-name-input" placeholder="你的名字" maxlength="20">
-    <textarea class="comment-text-input" placeholder="写点什么吧..." maxlength="500" rows="2"></textarea>
-    <button class="comment-submit">留言</button>
-  </div></div>`;
-  return h;
-}
-
-function setupCommentForms() {
-  document.querySelectorAll(".comment-submit").forEach(btn => {
-    btn.addEventListener("click", function() {
-      const form = this.closest(".comment-form");
-      const key = form.dataset.key;
-      const name = form.querySelector(".comment-name-input").value.trim() || "匿名";
-      const text = form.querySelector(".comment-text-input").value.trim();
-      if (!text) { form.querySelector(".comment-text-input").focus(); return; }
-      saveComment(key, name, text);
-      // 重新渲染整个事件卡片
-      const card = this.closest(".event-card-detail");
-      const event = findEventByKey(key);
-      if (event) {
-        card.outerHTML = buildEventCardHTML(event);
-        setupCommentForms();
-      }
+// ========== Twikoo 评论 ==========
+function initTwikoo() {
+  if (typeof twikoo === "undefined") return;
+  document.querySelectorAll(".twikoo-container").forEach(el => {
+    twikoo.init({
+      envId: TWIKOO_ENV_ID,
+      el: `#${el.id}`,
     });
   });
-}
-
-function findEventByKey(key) {
-  for (const sem of bandData.semesters) {
-    for (const ev of sem.events) {
-      if (`${ev.date}-${ev.title}` === key) return ev;
-    }
-  }
-  return null;
 }
 
 // ========== 往年今日 ==========
@@ -185,11 +141,9 @@ function renderAlbums() {
     </div>`;
   });
   el.innerHTML = h;
-  // 点击事件
   el.querySelectorAll(".album-card").forEach(card => {
     card.addEventListener("click", () => showSemester(parseInt(card.dataset.idx)));
   });
-  // 动画
   requestAnimationFrame(() => {
     el.querySelectorAll(".album-card").forEach((c, i) => {
       setTimeout(() => c.classList.add("visible"), i * 80);
@@ -208,12 +162,12 @@ function showSemester(idx) {
   let h = `<h2 class="semester-title">${semEmoji(sem.semester)} ${esc(sem.semester)}</h2>`;
   sem.events.forEach(ev => { h += buildEventCardHTML(ev); });
   document.getElementById("event-content").innerHTML = h;
-  setupCommentForms();
+  initTwikoo();
   window.scrollTo(0, 0);
 }
 
 function buildEventCardHTML(ev) {
-  const key = `${ev.date}-${ev.title}`;
+  const key = eventKey(ev);
   let h = `<div class="event-card-detail">`;
   h += `<span class="event-date">${fmtDate(ev.date)}</span>`;
   h += `<h3 class="event-title">${esc(ev.title)}</h3>`;
@@ -224,15 +178,16 @@ function buildEventCardHTML(ev) {
     });
     h += `</div>`;
   }
-  h += buildCommentsHTML(key);
+  h += `<div class="comments-section">
+    <h4 class="comments-title">💬 留言</h4>
+    <div id="tcomment-${key}" class="twikoo-container"></div>
+  </div>`;
   h += `</div>`;
   return h;
 }
 
 function setupBackButton() {
-  const btn = document.getElementById("back-btn");
-  if (!btn) return;
-  btn.addEventListener("click", () => {
+  document.getElementById("back-btn")?.addEventListener("click", () => {
     document.getElementById("event-detail").style.display = "none";
     document.getElementById("album-list").style.display = "grid";
     document.getElementById("random-btn").style.display = "";
@@ -253,7 +208,6 @@ function setupLightbox() {
     if (e.key === "ArrowLeft") nav(-1);
     if (e.key === "ArrowRight") nav(1);
   });
-  // 委托点击事件（支持动态生成的照片）
   document.addEventListener("click", e => {
     const img = e.target.closest(".photo-grid img");
     if (img) openLightbox(img);
