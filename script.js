@@ -15,7 +15,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     return;
   }
 
-  // 检查是否已输入过密码
   const savedPassword = localStorage.getItem("band_password");
   if (savedPassword === bandData.password) {
     showMainContent();
@@ -28,10 +27,14 @@ document.addEventListener("DOMContentLoaded", async () => {
 function showLoadingError() {
   const gate = document.getElementById("password-gate");
   if (gate) {
-    gate.querySelector(".password-box p").textContent =
-      "加载失败，请刷新页面重试";
-    gate.querySelector(".password-box input").style.display = "none";
-    gate.querySelector(".password-box button").style.display = "none";
+    const box = gate.querySelector(".password-box");
+    if (box) {
+      box.innerHTML = `
+        <h1 class="band-logo">&#127928;</h1>
+        <h2>加载失败</h2>
+        <p>请刷新页面重试</p>
+      `;
+    }
   }
 }
 
@@ -45,7 +48,6 @@ function setupPasswordGate() {
   input.addEventListener("keydown", (e) => {
     if (e.key === "Enter") checkPassword(input, error);
   });
-  // 自动聚焦
   input.focus();
 }
 
@@ -66,7 +68,9 @@ function showMainContent() {
   document.getElementById("band-name").textContent = bandData.band_name;
   document.title = bandData.band_name + " - 时光线";
   renderTimeline();
+  renderOnThisDay();
   setupLightbox();
+  setupRandomButton();
 }
 
 // ========== 工具函数 ==========
@@ -86,12 +90,64 @@ function escapeAttr(str) {
 }
 
 function formatDate(dateStr) {
-  // 直接拆字符串，避免时区问题
   const parts = dateStr.split("-");
   if (parts.length === 3) {
     return `${parts[0]}.${parts[1]}.${parts[2]}`;
   }
   return dateStr;
+}
+
+function getThumbPath(photoPath) {
+  // images/2024-04-12-草地音乐节/1.jpg -> images/_thumbs/2024-04-12-草地音乐节/1.jpg
+  return photoPath.replace("images/", "images/_thumbs/");
+}
+
+// ========== 往年今日 ==========
+function renderOnThisDay() {
+  const container = document.getElementById("on-this-day");
+  if (!container) return;
+
+  const today = new Date();
+  const month = String(today.getMonth() + 1).padStart(2, "0");
+  const day = String(today.getDate()).padStart(2, "0");
+  const todayKey = `${month}-${day}`;
+
+  const matches = [];
+  bandData.events.forEach((event) => {
+    const parts = event.date.split("-");
+    if (parts.length === 3) {
+      const eventKey = `${parts[1]}-${parts[2]}`;
+      if (eventKey === todayKey && event.photos && event.photos.length > 0) {
+        matches.push(event);
+      }
+    }
+  });
+
+  if (matches.length === 0) {
+    container.style.display = "none";
+    return;
+  }
+
+  container.style.display = "block";
+  let html = `<h2 class="section-title">?? ????</h2>`;
+  html += '<div class="otd-grid">';
+  matches.forEach((event) => {
+    const year = event.date.split("-")[0];
+    html += `
+      <div class="otd-card">
+        <img src="${escapeAttr(getThumbPath(event.photos[0]))}"
+             data-full="${escapeAttr(event.photos[0])}"
+             alt="${escapeAttr(event.title)}"
+             onclick="openLightboxFromOtd(this)">
+        <div class="otd-info">
+          <span class="otd-year">${year}</span>
+          <span class="otd-title">${escapeHtml(event.title)}</span>
+        </div>
+      </div>
+    `;
+  });
+  html += "</div>";
+  container.innerHTML = html;
 }
 
 // ========== 时间线渲染 ==========
@@ -132,7 +188,8 @@ function createEventCard(event) {
   if (event.photos && event.photos.length > 0) {
     html += '<div class="photo-grid">';
     event.photos.forEach((photo, index) => {
-      html += `<img src="${escapeAttr(photo)}" alt="照片" loading="lazy" data-index="${index}" onclick="openLightbox(this)">`;
+      const thumb = getThumbPath(photo);
+      html += `<img src="${escapeAttr(thumb)}" data-full="${escapeAttr(photo)}" alt="照片" loading="lazy" data-index="${index}" onclick="openLightbox(this)">`;
     });
     html += "</div>";
   }
@@ -147,7 +204,6 @@ function createEventCard(event) {
 
 // ========== 滚动动画 ==========
 function setupScrollAnimation() {
-  // 清理之前的 observer
   if (scrollObserver) {
     scrollObserver.disconnect();
   }
@@ -195,9 +251,28 @@ function setupLightbox() {
 function openLightbox(imgElement) {
   const card = imgElement.closest(".event-card");
   const photos = Array.from(card.querySelectorAll(".photo-grid img")).map(
-    (img) => img.src
+    (img) => img.dataset.full || img.src
   );
   const index = parseInt(imgElement.dataset.index, 10);
+
+  currentLightboxPhotos = photos;
+  currentLightboxIndex = index;
+
+  const lightbox = document.getElementById("lightbox");
+  const lightboxImg = document.getElementById("lightbox-img");
+
+  lightboxImg.src = photos[index];
+  lightbox.style.display = "flex";
+  document.body.style.overflow = "hidden";
+}
+
+function openLightboxFromOtd(imgElement) {
+  const otdCard = imgElement.closest(".otd-card");
+  const otdGrid = otdCard.closest(".otd-grid");
+  const photos = Array.from(otdGrid.querySelectorAll("img")).map(
+    (img) => img.dataset.full || img.src
+  );
+  const index = Array.from(otdGrid.children).indexOf(otdCard);
 
   currentLightboxPhotos = photos;
   currentLightboxIndex = index;
@@ -221,4 +296,41 @@ function navigateLightbox(direction) {
     currentLightboxPhotos.length;
   document.getElementById("lightbox-img").src =
     currentLightboxPhotos[currentLightboxIndex];
+}
+
+// ========== 随机看照片 ==========
+function setupRandomButton() {
+  const btn = document.getElementById("random-btn");
+  if (!btn) return;
+
+  btn.addEventListener("click", () => {
+    // 收集所有照片
+    const allPhotos = [];
+    bandData.events.forEach((event) => {
+      if (event.photos) {
+        event.photos.forEach((photo) => {
+          allPhotos.push({
+            full: photo,
+            title: event.title,
+            date: event.date,
+          });
+        });
+      }
+    });
+
+    if (allPhotos.length === 0) return;
+
+    // 随机选一张
+    const pick = allPhotos[Math.floor(Math.random() * allPhotos.length)];
+
+    currentLightboxPhotos = allPhotos.map((p) => p.full);
+    currentLightboxIndex = allPhotos.indexOf(pick);
+
+    const lightbox = document.getElementById("lightbox");
+    const lightboxImg = document.getElementById("lightbox-img");
+
+    lightboxImg.src = pick.full;
+    lightbox.style.display = "flex";
+    document.body.style.overflow = "hidden";
+  });
 }
