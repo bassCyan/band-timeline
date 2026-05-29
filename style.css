@@ -1,12 +1,4 @@
 /* ========== 设计系统 ========== */
-/*
- * Spacing scale:  4, 8, 12, 16, 24, 32, 48, 64, 96, 128
- * Type scale:     12, 14, 16, 18, 20, 24, 30, 36, 48
- * Grey scale:     HSL(230, 15%, X%)  — 冷色调灰，避免"死灰"
- * Primary (金):   HSL(42, 76%, X%)   — 暖金色
- * Shadow system:  sm / md / lg / xl
- */
-
 :root {
   --grey-50:  hsl(230, 15%, 96%);
   --grey-100: hsl(230, 15%, 88%);
@@ -18,23 +10,19 @@
   --grey-700: hsl(230, 15%, 20%);
   --grey-800: hsl(230, 15%, 14%);
   --grey-900: hsl(230, 15%, 8%);
-
   --gold-50:  hsl(42, 76%, 95%);
   --gold-100: hsl(42, 76%, 80%);
   --gold-200: hsl(42, 76%, 65%);
   --gold-300: hsl(42, 76%, 55%);
   --gold-400: hsl(42, 76%, 48%);
   --gold-500: hsl(42, 76%, 40%);
-
   --bg-primary:   hsl(240, 20%, 10%);
   --bg-secondary: hsl(240, 18%, 13%);
   --bg-card:      hsl(240, 16%, 16%);
   --bg-elevated:  hsl(240, 14%, 20%);
-
   --text-primary:   hsl(230, 15%, 92%);
   --text-secondary: hsl(230, 12%, 60%);
   --text-tertiary:  hsl(230, 10%, 45%);
-
   --shadow-sm:  0 1px 2px rgba(0,0,0,0.3), 0 1px 3px rgba(0,0,0,0.15);
   --shadow-md:  0 4px 6px rgba(0,0,0,0.3), 0 2px 4px rgba(0,0,0,0.2);
   --shadow-lg:  0 10px 25px rgba(0,0,0,0.4), 0 4px 10px rgba(0,0,0,0.25);
@@ -42,710 +30,296 @@
 }
 
 /* ========== 基础重置 ========== */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+* { margin: 0; padding: 0; box-sizing: border-box; }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
-    "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
   background: var(--bg-primary);
   color: var(--text-primary);
   min-height: 100vh;
   overflow-x: hidden;
   font-size: 16px;
   line-height: 1.6;
-  /* 微妙点阵纹理，打破大面积纯色 */
   background-image: radial-gradient(circle, hsla(230, 15%, 100%, 0.03) 1px, transparent 1px);
   background-size: 24px 24px;
 }
 
 /* ========== 密码门 ========== */
 .password-gate {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
   background: var(--bg-primary);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  display: flex; align-items: center; justify-content: center;
   z-index: 1000;
 }
-
 .password-gate::before {
-  content: "";
-  position: absolute;
-  top: -50%;
-  left: -50%;
-  width: 200%;
-  height: 200%;
-  background:
-    radial-gradient(circle at 30% 40%, hsla(42, 76%, 48%, 0.08) 0%, transparent 50%),
-    radial-gradient(circle at 70% 60%, hsla(230, 40%, 30%, 0.12) 0%, transparent 50%);
+  content: ""; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+  background: radial-gradient(circle at 30% 40%, hsla(42, 76%, 48%, 0.08) 0%, transparent 50%),
+              radial-gradient(circle at 70% 60%, hsla(230, 40%, 30%, 0.12) 0%, transparent 50%);
   pointer-events: none;
 }
-
 .password-box {
-  position: relative;
-  text-align: center;
-  padding: 48px 40px;
-  background: var(--bg-card);
-  border-radius: 16px;
-  border: 1px solid hsla(230, 15%, 100%, 0.08);
-  max-width: 400px;
-  width: 90%;
-  box-shadow: var(--shadow-xl);
-  border-top: 3px solid var(--gold-400);
-  /* 入场动画 */
+  position: relative; text-align: center; padding: 48px 40px;
+  background: var(--bg-card); border-radius: 16px;
+  border: 1px solid hsla(230, 15%, 100%, 0.08); border-top: 3px solid var(--gold-400);
+  max-width: 400px; width: 90%; box-shadow: var(--shadow-xl);
   animation: fadeInUp 0.6s ease-out;
 }
-
-@keyframes fadeInUp {
-  from { opacity: 0; transform: translateY(24px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
+@keyframes fadeInUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
 
 .band-logo {
-  font-size: 56px;
-  margin-bottom: 16px;
-  color: var(--gold-400);
+  font-size: 56px; margin-bottom: 16px; color: var(--gold-400);
   filter: drop-shadow(0 4px 16px hsla(42, 76%, 48%, 0.3));
   animation: float 3s ease-in-out infinite;
 }
+@keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
 
-@keyframes float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-6px); }
-}
-
-.password-box h2 {
-  color: var(--gold-300);
-  font-size: 24px;
-  font-weight: 700;
-  margin-bottom: 8px;
-  letter-spacing: -0.02em;
-}
-
-.password-box > p {
-  color: var(--text-secondary);
-  font-size: 14px;
-  margin-bottom: 24px;
-}
-
+.password-box h2 { color: var(--gold-300); font-size: 24px; font-weight: 700; margin-bottom: 8px; letter-spacing: -0.02em; }
+.password-box > p { color: var(--text-secondary); font-size: 14px; margin-bottom: 24px; }
 .password-box input {
-  width: 100%;
-  padding: 12px 16px;
-  border: 1px solid hsla(230, 15%, 100%, 0.12);
-  border-radius: 8px;
-  background: var(--bg-secondary);
-  color: var(--text-primary);
-  font-size: 16px;
-  outline: none;
-  margin-bottom: 16px;
-  transition: border-color 0.2s, box-shadow 0.2s;
+  width: 100%; padding: 12px 16px; border: 1px solid hsla(230, 15%, 100%, 0.12);
+  border-radius: 8px; background: var(--bg-secondary); color: var(--text-primary);
+  font-size: 16px; outline: none; margin-bottom: 16px; transition: border-color 0.2s, box-shadow 0.2s;
 }
-
-.password-box input:focus {
-  border-color: var(--gold-400);
-  box-shadow: 0 0 0 3px hsla(42, 76%, 48%, 0.15);
-}
-
+.password-box input:focus { border-color: var(--gold-400); box-shadow: 0 0 0 3px hsla(42, 76%, 48%, 0.15); }
 .password-box button {
-  width: 100%;
-  padding: 12px 24px;
-  background: var(--gold-400);
-  color: var(--grey-900);
-  border: none;
-  border-radius: 8px;
-  font-size: 16px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.2s, transform 0.1s, box-shadow 0.2s;
-  box-shadow: var(--shadow-sm);
+  width: 100%; padding: 12px 24px; background: var(--gold-400); color: var(--grey-900);
+  border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer;
+  transition: background 0.2s, transform 0.1s, box-shadow 0.2s; box-shadow: var(--shadow-sm);
 }
-
-.password-box button:hover {
-  background: var(--gold-300);
-  box-shadow: var(--shadow-md);
-}
-
-.password-box button:active {
-  transform: scale(0.98);
-}
-
-.error-msg {
-  color: hsl(0, 72%, 60%);
-  margin-top: 12px;
-  font-size: 14px;
-  font-weight: 500;
-}
+.password-box button:hover { background: var(--gold-300); box-shadow: var(--shadow-md); }
+.password-box button:active { transform: scale(0.98); }
+.error-msg { color: hsl(0, 72%, 60%); margin-top: 12px; font-size: 14px; font-weight: 500; }
 
 /* ========== 主内容 ========== */
-.main-content {
-  max-width: 900px;
-  margin: 0 auto;
-  padding: 24px 24px 0;
-  animation: fadeIn 0.4s ease-out;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to   { opacity: 1; }
-}
+.main-content { max-width: 900px; margin: 0 auto; padding: 24px 24px 0; animation: fadeIn 0.4s ease-out; }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
 /* ========== 顶部 ========== */
-.header {
-  text-align: center;
-  padding: 48px 0 64px;
-  position: relative;
-}
-
-/* 顶部装饰光晕 */
+.header { text-align: center; padding: 48px 0 48px; position: relative; }
 .header::before {
-  content: "";
-  position: absolute;
-  top: -32px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 200px;
-  height: 200px;
+  content: ""; position: absolute; top: -32px; left: 50%; transform: translateX(-50%);
+  width: 200px; height: 200px;
   background: radial-gradient(circle, hsla(42, 76%, 48%, 0.08) 0%, transparent 70%);
   pointer-events: none;
 }
+.header h1 { color: var(--gold-300); font-size: 36px; font-weight: 700; letter-spacing: -0.02em; text-shadow: 0 2px 12px hsla(42, 76%, 48%, 0.15); }
 
-.header h1 {
-  color: var(--gold-300);
-  font-size: 36px;
-  font-weight: 700;
-  margin-bottom: 8px;
-  letter-spacing: -0.02em;
-  text-shadow: 0 2px 12px hsla(42, 76%, 48%, 0.15);
-}
-
-.subtitle {
-  color: var(--text-secondary);
-  font-size: 16px;
-  font-weight: 400;
-  display: inline-block;
-  padding-bottom: 16px;
-  border-bottom: 2px solid var(--gold-500);
-}
-
-/* ========== 操作按钮 ========== */
-.header-actions {
-  margin-top: 20px;
-}
-
+.header-actions { margin-top: 20px; }
 .action-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 24px;
-  background: hsla(42, 76%, 48%, 0.1);
-  color: var(--gold-300);
-  border: 1px solid hsla(42, 76%, 48%, 0.2);
-  border-radius: 24px;
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  position: relative;
-  overflow: hidden;
+  display: inline-flex; align-items: center; gap: 8px; padding: 10px 24px;
+  background: hsla(42, 76%, 48%, 0.1); color: var(--gold-300);
+  border: 1px solid hsla(42, 76%, 48%, 0.2); border-radius: 24px;
+  font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.2s ease;
 }
-
-.action-btn::before {
-  content: "";
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 0;
-  height: 0;
-  background: hsla(42, 76%, 48%, 0.15);
-  border-radius: 50%;
-  transform: translate(-50%, -50%);
-  transition: width 0.4s, height 0.4s;
-}
-
-.action-btn:hover::before {
-  width: 200px;
-  height: 200px;
-}
-
-.action-btn:hover {
-  border-color: hsla(42, 76%, 48%, 0.4);
-  box-shadow: 0 0 20px hsla(42, 76%, 48%, 0.15);
-}
-
-.action-btn:active {
-  transform: scale(0.96);
-}
+.action-btn:hover { background: hsla(42, 76%, 48%, 0.2); border-color: hsla(42, 76%, 48%, 0.4); box-shadow: 0 0 20px hsla(42, 76%, 48%, 0.15); }
+.action-btn:active { transform: scale(0.96); }
 
 /* ========== 往年今日 ========== */
-.section-title {
-  color: var(--gold-300);
-  font-size: 18px;
-  font-weight: 600;
-  margin-bottom: 16px;
-  letter-spacing: -0.01em;
-}
-
+.section-title { color: var(--gold-300); font-size: 18px; font-weight: 600; margin-bottom: 16px; letter-spacing: -0.01em; }
 .on-this-day {
-  margin-bottom: 48px;
-  padding: 24px;
-  background: var(--bg-card);
-  border-radius: 16px;
-  border: 1px solid hsla(42, 76%, 48%, 0.12);
-  border-top: 3px solid var(--gold-500);
-  box-shadow: var(--shadow-md);
-  /* 微妙内发光 */
+  margin-bottom: 32px; padding: 24px; background: var(--bg-card); border-radius: 16px;
+  border: 1px solid hsla(42, 76%, 48%, 0.12); border-top: 3px solid var(--gold-500);
   box-shadow: var(--shadow-md), inset 0 1px 0 hsla(42, 76%, 48%, 0.05);
 }
-
-.otd-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-  gap: 16px;
-}
-
+.otd-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 16px; }
 .otd-card {
-  position: relative;
-  border-radius: 12px;
-  overflow: hidden;
-  cursor: pointer;
-  box-shadow: var(--shadow-sm);
+  position: relative; border-radius: 12px; overflow: hidden; cursor: pointer;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
-  /* 照片内阴影防止颜色外溢 */
   box-shadow: var(--shadow-sm), inset 0 0 0 1px hsla(230, 15%, 100%, 0.05);
 }
+.otd-card:hover { transform: translateY(-6px) scale(1.02); box-shadow: var(--shadow-lg), inset 0 0 0 1px hsla(42, 76%, 48%, 0.2); }
+.otd-card img { width: 100%; height: 160px; object-fit: cover; display: block; transition: transform 0.4s ease; }
+.otd-card:hover img { transform: scale(1.08); }
+.otd-info { position: absolute; bottom: 0; left: 0; right: 0; padding: 12px; background: linear-gradient(transparent, rgba(0,0,0,0.75)); color: #fff; }
+.otd-year { display: block; font-size: 11px; font-weight: 600; color: var(--gold-200); letter-spacing: 0.05em; text-transform: uppercase; }
+.otd-title { display: block; font-size: 13px; font-weight: 500; margin-top: 2px; }
 
-.otd-card:hover {
-  transform: translateY(-6px) scale(1.02);
-  box-shadow: var(--shadow-lg), inset 0 0 0 1px hsla(42, 76%, 48%, 0.2);
-}
-
-.otd-card img {
-  width: 100%;
-  height: 160px;
-  object-fit: cover;
-  display: block;
-  transition: transform 0.4s ease;
-}
-
-.otd-card:hover img {
-  transform: scale(1.08);
-}
-
-.otd-info {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  padding: 12px;
-  background: linear-gradient(transparent, rgba(0,0,0,0.75));
-  color: #fff;
-}
-
-.otd-year {
-  display: block;
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--gold-200);
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-}
-
-.otd-title {
-  display: block;
-  font-size: 13px;
-  font-weight: 500;
-  margin-top: 2px;
-}
-
-/* ========== 时间线 ========== */
-.timeline {
-  position: relative;
-  padding: 32px 0;
-}
-
-.timeline::before {
-  content: "";
-  position: absolute;
-  left: 50%;
-  top: 0;
-  bottom: 0;
-  width: 2px;
-  background: linear-gradient(
-    to bottom,
-    transparent,
-    var(--gold-500) 10%,
-    var(--gold-500) 90%,
-    transparent
-  );
-  transform: translateX(-50%);
-}
-
-/* ========== 事件卡片 ========== */
-.event-card {
-  position: relative;
-  width: 45%;
-  padding: 24px;
-  background: var(--bg-card);
-  border-radius: 16px;
-  border: 1px solid hsla(230, 15%, 100%, 0.06);
+/* ========== 学期相册 ========== */
+.album-list {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 20px;
   margin-bottom: 48px;
-  opacity: 0;
-  transform: translateY(32px);
-  transition: opacity 0.6s ease, transform 0.6s ease, box-shadow 0.3s ease;
+}
+
+.album-card {
+  background: var(--bg-card); border-radius: 16px; overflow: hidden; cursor: pointer;
+  border: 1px solid hsla(230, 15%, 100%, 0.06);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
   box-shadow: var(--shadow-sm);
-  border-top: 2px solid var(--gold-500);
+  opacity: 0; transform: translateY(20px);
+}
+.album-card.visible { opacity: 1; transform: translateY(0); transition: opacity 0.5s ease, transform 0.5s ease, box-shadow 0.3s ease; }
+.album-card:hover { transform: translateY(-6px); box-shadow: var(--shadow-lg); border-color: hsla(42, 76%, 48%, 0.15); }
+
+.album-cover {
+  width: 100%; height: 180px; background-color: var(--bg-secondary);
+  background-size: cover; background-position: center;
+  position: relative; display: flex; align-items: center; justify-content: center;
+}
+.album-cover::after {
+  content: ""; position: absolute; bottom: 0; left: 0; right: 0; height: 60px;
+  background: linear-gradient(transparent, var(--bg-card));
+}
+.album-emoji { font-size: 48px; opacity: 0.3; }
+
+.album-info { padding: 16px 20px 20px; }
+.album-title { font-size: 18px; font-weight: 600; color: var(--text-primary); margin-bottom: 4px; }
+.album-meta { font-size: 13px; color: var(--text-secondary); }
+
+/* ========== 事件详情 ========== */
+.event-detail { margin-bottom: 48px; }
+.semester-title {
+  color: var(--gold-300); font-size: 24px; font-weight: 700; margin-bottom: 32px;
+  letter-spacing: -0.02em; padding-bottom: 16px; border-bottom: 2px solid hsla(42, 76%, 48%, 0.15);
 }
 
-.event-card.visible {
-  opacity: 1;
-  transform: translateY(0);
+.back-btn {
+  display: inline-flex; align-items: center; gap: 4px; padding: 8px 16px;
+  background: hsla(230, 15%, 100%, 0.05); color: var(--text-secondary);
+  border: 1px solid hsla(230, 15%, 100%, 0.1); border-radius: 8px;
+  font-size: 14px; cursor: pointer; margin-bottom: 24px; transition: all 0.2s;
 }
+.back-btn:hover { background: hsla(230, 15%, 100%, 0.1); color: var(--text-primary); }
 
-.event-card:hover {
-  box-shadow: var(--shadow-lg);
-  border-color: hsla(230, 15%, 100%, 0.1);
+.event-card-detail {
+  background: var(--bg-card); border-radius: 16px; padding: 24px;
+  margin-bottom: 24px; border: 1px solid hsla(230, 15%, 100%, 0.06);
+  border-top: 2px solid var(--gold-500); box-shadow: var(--shadow-sm);
+  opacity: 0; transform: translateY(20px);
 }
+.event-card-detail.visible { opacity: 1; transform: translateY(0); transition: opacity 0.5s ease, transform 0.5s ease; }
 
-/* 左右交替 */
-.event-card:nth-child(odd) {
-  margin-left: 5%;
-}
-
-.event-card:nth-child(even) {
-  margin-left: 50%;
-}
-
-/* 时间线节点 */
-.event-card::before {
-  content: "";
-  position: absolute;
-  top: 30px;
-  width: 14px;
-  height: 14px;
-  background: var(--gold-400);
-  border: 3px solid var(--bg-primary);
-  border-radius: 50%;
-  z-index: 1;
-  box-shadow: 0 0 0 2px var(--gold-500), 0 0 12px hsla(42, 76%, 48%, 0.3);
-  transition: box-shadow 0.3s;
-}
-
-.event-card:hover::before {
-  box-shadow: 0 0 0 2px var(--gold-400), 0 0 20px hsla(42, 76%, 48%, 0.5);
-}
-
-.event-card:nth-child(odd)::before {
-  right: -7%;
-  transform: translateX(50%);
-}
-
-.event-card:nth-child(even)::before {
-  left: -7%;
-  transform: translateX(-50%);
-}
-
-/* 连接线 */
-.event-card::after {
-  content: "";
-  position: absolute;
-  top: 35px;
-  width: 5%;
-  height: 2px;
-  background: var(--gold-500);
-  opacity: 0.4;
-}
-
-.event-card:nth-child(odd)::after {
-  right: -5%;
-}
-
-.event-card:nth-child(even)::after {
-  left: -5%;
-}
-
-/* ========== 卡片内容 ========== */
 .event-date {
-  display: inline-block;
-  background: hsla(42, 76%, 48%, 0.1);
-  color: var(--gold-300);
-  padding: 4px 14px;
-  border-radius: 20px;
-  font-size: 13px;
-  font-weight: 500;
-  margin-bottom: 12px;
-  letter-spacing: 0.02em;
-  border: 1px solid hsla(42, 76%, 48%, 0.12);
+  display: inline-block; background: hsla(42, 76%, 48%, 0.1); color: var(--gold-300);
+  padding: 4px 14px; border-radius: 20px; font-size: 13px; font-weight: 500;
+  margin-bottom: 12px; letter-spacing: 0.02em; border: 1px solid hsla(42, 76%, 48%, 0.12);
 }
-
-.event-title {
-  font-size: 20px;
-  font-weight: 600;
-  color: var(--text-primary);
-  margin-bottom: 8px;
-  letter-spacing: -0.01em;
-}
-
-.event-desc {
-  color: var(--text-secondary);
-  font-size: 14px;
-  line-height: 1.6;
-  margin-bottom: 16px;
-}
+.event-title { font-size: 20px; font-weight: 600; color: var(--text-primary); margin-bottom: 12px; letter-spacing: -0.01em; }
+.event-desc { color: var(--text-secondary); font-size: 14px; line-height: 1.6; margin-bottom: 16px; }
 
 /* ========== 照片网格 ========== */
-.photo-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-  gap: 8px;
-}
-
+.photo-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 8px; margin-bottom: 4px; }
 .photo-grid img {
-  width: 100%;
-  height: 100px;
-  object-fit: cover;
-  border-radius: 10px;
-  cursor: pointer;
+  width: 100%; height: 100px; object-fit: cover; border-radius: 10px; cursor: pointer;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
-  box-shadow: var(--shadow-sm);
-  /* 照片内阴影 */
   box-shadow: var(--shadow-sm), inset 0 0 0 1px hsla(230, 15%, 100%, 0.05);
 }
+.photo-grid img:hover { transform: scale(1.08); box-shadow: var(--shadow-lg), 0 0 0 2px var(--gold-500); }
 
-.photo-grid img:hover {
-  transform: scale(1.08);
-  box-shadow: var(--shadow-lg), 0 0 0 2px var(--gold-500), inset 0 0 0 1px hsla(42, 76%, 48%, 0.1);
+/* ========== 评论 ========== */
+.comments-section {
+  margin-top: 16px; padding-top: 16px;
+  border-top: 1px solid hsla(230, 15%, 100%, 0.06);
 }
+.comments-title { color: var(--text-secondary); font-size: 14px; font-weight: 600; margin-bottom: 12px; }
+.comments-list { margin-bottom: 16px; }
+.comment-item {
+  padding: 12px; background: var(--bg-secondary); border-radius: 10px; margin-bottom: 8px;
+  border: 1px solid hsla(230, 15%, 100%, 0.04);
+}
+.comment-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+.comment-name { font-size: 13px; font-weight: 600; color: var(--gold-300); }
+.comment-time { font-size: 11px; color: var(--text-tertiary); }
+.comment-text { font-size: 14px; color: var(--text-primary); line-height: 1.5; }
 
-/* ========== 视频按钮 ========== */
-.video-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 16px;
-  background: hsla(42, 76%, 48%, 0.1);
-  color: var(--gold-300);
-  border: 1px solid hsla(42, 76%, 48%, 0.2);
-  border-radius: 8px;
-  text-decoration: none;
-  font-size: 14px;
-  font-weight: 500;
-  margin-top: 12px;
-  transition: all 0.2s ease;
+.comment-form { display: flex; flex-direction: column; gap: 8px; }
+.comment-name-input {
+  padding: 8px 12px; border: 1px solid hsla(230, 15%, 100%, 0.1); border-radius: 8px;
+  background: var(--bg-secondary); color: var(--text-primary); font-size: 14px; outline: none;
+  width: 160px; transition: border-color 0.2s;
 }
-
-.video-link:hover {
-  background: hsla(42, 76%, 48%, 0.2);
-  border-color: hsla(42, 76%, 48%, 0.4);
-  box-shadow: 0 0 16px hsla(42, 76%, 48%, 0.15);
+.comment-name-input:focus { border-color: var(--gold-400); }
+.comment-text-input {
+  padding: 10px 12px; border: 1px solid hsla(230, 15%, 100%, 0.1); border-radius: 8px;
+  background: var(--bg-secondary); color: var(--text-primary); font-size: 14px;
+  outline: none; resize: vertical; font-family: inherit; transition: border-color 0.2s;
 }
+.comment-text-input:focus { border-color: var(--gold-400); }
+.comment-submit {
+  align-self: flex-end; padding: 8px 20px; background: var(--gold-400); color: var(--grey-900);
+  border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+}
+.comment-submit:hover { background: var(--gold-300); }
+.comment-submit:active { transform: scale(0.96); }
 
 /* ========== 灯箱 ========== */
 .lightbox {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: hsla(240, 20%, 6%, 0.95);
-  backdrop-filter: blur(12px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 2000;
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  background: hsla(240, 20%, 6%, 0.95); backdrop-filter: blur(12px);
+  display: flex; align-items: center; justify-content: center; z-index: 2000;
   animation: fadeIn 0.2s ease-out;
 }
-
 .lightbox img {
-  max-width: 90%;
-  max-height: 90vh;
-  object-fit: contain;
-  border-radius: 12px;
-  box-shadow: var(--shadow-xl);
-  animation: lightboxIn 0.3s ease-out;
+  max-width: 90%; max-height: 90vh; object-fit: contain; border-radius: 12px;
+  box-shadow: var(--shadow-xl); animation: lightboxIn 0.3s ease-out;
 }
-
-@keyframes lightboxIn {
-  from { opacity: 0; transform: scale(0.9); }
-  to   { opacity: 1; transform: scale(1); }
-}
+@keyframes lightboxIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
 
 .lightbox-close {
-  position: absolute;
-  top: 24px;
-  right: 24px;
-  background: hsla(230, 15%, 100%, 0.1);
-  border: 1px solid hsla(230, 15%, 100%, 0.15);
-  color: var(--text-primary);
-  font-size: 24px;
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  cursor: pointer;
-  z-index: 2001;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s;
-  backdrop-filter: blur(8px);
+  position: absolute; top: 24px; right: 24px;
+  background: hsla(230, 15%, 100%, 0.1); border: 1px solid hsla(230, 15%, 100%, 0.15);
+  color: var(--text-primary); font-size: 24px; width: 44px; height: 44px;
+  border-radius: 50%; cursor: pointer; z-index: 2001;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.2s; backdrop-filter: blur(8px);
 }
+.lightbox-close:hover { background: hsla(230, 15%, 100%, 0.2); transform: rotate(90deg); }
 
-.lightbox-close:hover {
-  background: hsla(230, 15%, 100%, 0.2);
-  transform: rotate(90deg);
+.lightbox-prev, .lightbox-next {
+  position: absolute; top: 50%; transform: translateY(-50%);
+  background: hsla(230, 15%, 100%, 0.1); border: 1px solid hsla(230, 15%, 100%, 0.15);
+  color: var(--text-primary); font-size: 20px; width: 48px; height: 48px;
+  cursor: pointer; border-radius: 50%; transition: all 0.2s;
+  display: flex; align-items: center; justify-content: center; backdrop-filter: blur(8px);
 }
-
-.lightbox-prev,
-.lightbox-next {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  background: hsla(230, 15%, 100%, 0.1);
-  border: 1px solid hsla(230, 15%, 100%, 0.15);
-  color: var(--text-primary);
-  font-size: 20px;
-  width: 48px;
-  height: 48px;
-  cursor: pointer;
-  border-radius: 50%;
-  transition: all 0.2s;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  backdrop-filter: blur(8px);
-}
-
 .lightbox-prev { left: 24px; }
 .lightbox-next { right: 24px; }
-
-.lightbox-prev:hover,
-.lightbox-next:hover {
-  background: hsla(230, 15%, 100%, 0.2);
-  transform: translateY(-50%) scale(1.1);
-}
+.lightbox-prev:hover, .lightbox-next:hover { background: hsla(230, 15%, 100%, 0.2); transform: translateY(-50%) scale(1.1); }
 
 /* ========== 底部 ========== */
-.footer {
-  text-align: center;
-  padding: 96px 0 48px;
-  color: var(--text-tertiary);
-  font-size: 14px;
-  position: relative;
-}
-
-/* 分隔线 */
+.footer { text-align: center; padding: 96px 0 48px; color: var(--text-tertiary); font-size: 14px; position: relative; }
 .footer::before {
-  content: "";
-  position: absolute;
-  top: 48px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 48px;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, var(--gold-500), transparent);
+  content: ""; position: absolute; top: 48px; left: 50%; transform: translateX(-50%);
+  width: 48px; height: 2px; background: linear-gradient(90deg, transparent, var(--gold-500), transparent);
 }
-
 .qrcode {
-  width: 150px;
-  margin-top: 16px;
-  border-radius: 12px;
-  border: 2px solid hsla(230, 15%, 100%, 0.08);
-  box-shadow: var(--shadow-md);
+  width: 150px; margin-top: 16px; border-radius: 12px;
+  border: 2px solid hsla(230, 15%, 100%, 0.08); box-shadow: var(--shadow-md);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
-
-.qrcode:hover {
-  transform: scale(1.08) rotate(2deg);
-  box-shadow: var(--shadow-lg);
-}
+.qrcode:hover { transform: scale(1.08) rotate(2deg); box-shadow: var(--shadow-lg); }
 
 /* ========== 空状态 ========== */
 .empty-state {
-  text-align: center;
-  padding: 80px 24px;
-  color: var(--text-tertiary);
-  font-size: 16px;
-  border: 2px dashed hsla(230, 15%, 100%, 0.1);
-  border-radius: 16px;
-  margin: 0 5%;
-  position: relative;
+  text-align: center; padding: 80px 24px; color: var(--text-tertiary); font-size: 16px;
+  border: 2px dashed hsla(230, 15%, 100%, 0.1); border-radius: 16px; margin: 0 5%;
 }
+.empty-state::before { content: "✦"; display: block; font-size: 48px; margin-bottom: 16px; color: var(--gold-400); }
 
-.empty-state::before {
-  content: "✦";
-  display: block;
-  font-size: 48px;
-  margin-bottom: 16px;
-  color: var(--gold-400);
+/* ========== 视频按钮 ========== */
+.video-link {
+  display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px;
+  background: hsla(42, 76%, 48%, 0.1); color: var(--gold-300);
+  border: 1px solid hsla(42, 76%, 48%, 0.2); border-radius: 8px;
+  text-decoration: none; font-size: 14px; font-weight: 500; margin-top: 12px;
+  transition: all 0.2s ease;
 }
+.video-link:hover { background: hsla(42, 76%, 48%, 0.2); border-color: hsla(42, 76%, 48%, 0.4); }
 
-/* ========== 响应式 - 手机端 ========== */
+/* ========== 响应式 ========== */
 @media (max-width: 768px) {
-  .timeline::before {
-    left: 24px;
-  }
-
-  .event-card {
-    width: calc(100% - 56px);
-    margin-left: 56px !important;
-    padding: 20px;
-  }
-
-  .event-card::before {
-    left: -38px !important;
-    right: auto !important;
-    transform: none !important;
-  }
-
-  .event-card::after {
-    left: -20px !important;
-    right: auto !important;
-    width: 20px !important;
-  }
-
-  .header {
-    padding: 32px 0 48px;
-  }
-
-  .header h1 {
-    font-size: 24px;
-  }
-
-  .photo-grid {
-    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
-  }
-
-  .photo-grid img {
-    height: 80px;
-  }
-
-  .otd-grid {
-    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-  }
-
-  .otd-card img {
-    height: 120px;
-  }
-
-  .empty-state {
-    margin: 0;
-    padding: 48px 16px;
-  }
-
-  .lightbox-prev,
-  .lightbox-next {
-    width: 40px;
-    height: 40px;
-    font-size: 16px;
-  }
-
+  .header { padding: 32px 0 32px; }
+  .header h1 { font-size: 24px; }
+  .album-list { grid-template-columns: 1fr; }
+  .album-cover { height: 150px; }
+  .photo-grid { grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); }
+  .photo-grid img { height: 80px; }
+  .otd-grid { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); }
+  .otd-card img { height: 120px; }
+  .empty-state { margin: 0; padding: 48px 16px; }
+  .lightbox-prev, .lightbox-next { width: 40px; height: 40px; font-size: 16px; }
   .lightbox-prev { left: 12px; }
   .lightbox-next { right: 12px; }
+  .comment-name-input { width: 100%; }
+  .semester-title { font-size: 20px; }
 }

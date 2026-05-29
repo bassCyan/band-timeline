@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>我们的乐队 - 时光线</title>
+  <title>时光相册</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -21,25 +21,25 @@
 
   <!-- 主内容 -->
   <div id="main-content" class="main-content" style="display:none;">
-    <!-- 顶部 -->
     <header class="header">
       <h1 id="band-name">时光相册</h1>
       <div class="header-actions">
-        <button id="random-btn" class="action-btn">&#127922; 随机回忆</button>
+        <button id="random-btn" class="action-btn">&#10024; 随机回忆</button>
       </div>
     </header>
 
     <!-- 往年今日 -->
-    <section id="on-this-day" class="on-this-day" style="display:none;">
-      <!-- 由 JavaScript 动态生成 -->
-    </section>
+    <section id="on-this-day" class="on-this-day" style="display:none;"></section>
 
-    <!-- 时间线 -->
-    <div class="timeline" id="timeline">
-      <!-- 由 JavaScript 动态生成 -->
+    <!-- 学期相册 -->
+    <div id="album-list" class="album-list"></div>
+
+    <!-- 事件详情（点击学期后显示） -->
+    <div id="event-detail" class="event-detail" style="display:none;">
+      <button id="back-btn" class="back-btn">&#8592; 返回</button>
+      <div id="event-content"></div>
     </div>
 
-    <!-- 二维码 -->
     <footer class="footer">
       <p>扫码分享给乐队成员</p>
       <img src="qrcode.png" alt="二维码" class="qrcode" onerror="this.style.display='none'">
