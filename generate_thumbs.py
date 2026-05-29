@@ -18,7 +18,7 @@ except ImportError:
 
 
 THUMB_SIZE = 300  # 缩略图最大宽/高
-THUMB_DIR = "images/_thumbs"
+THUMB_DIR = "images/thumbs"
 
 
 def generate_thumbnails():
@@ -28,7 +28,7 @@ def generate_thumbnails():
     for ext in ("*.jpg", "*.jpeg", "*.png", "*.gif", "*.webp"):
         for path in glob.glob(os.path.join(image_dir, "**", ext), recursive=True):
             # 跳过缩略图目录本身
-            if "_thumbs" in path:
+            if "/thumbs/" in path or "\\thumbs\\" in path:
                 continue
 
             # 计算缩略图路径

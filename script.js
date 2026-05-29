@@ -98,8 +98,7 @@ function formatDate(dateStr) {
 }
 
 function getThumbPath(photoPath) {
-  // images/2024-04-12-草地音乐节/1.jpg -> images/_thumbs/2024-04-12-草地音乐节/1.jpg
-  return photoPath.replace("images/", "images/_thumbs/");
+  return photoPath.replace("images/", "images/thumbs/");
 }
 
 // ========== 往年今日 ==========
