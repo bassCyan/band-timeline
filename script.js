@@ -76,10 +76,6 @@ function semEmoji(s) {
   return "📷";
 }
 
-function eventKey(ev) {
-  return `${ev.date}-${ev.title}`.replace(/[^a-zA-Z0-9一-龥\-]/g, "_");
-}
-
 // ========== 往年今日 ==========
 function renderOnThisDay() {
   const el = document.getElementById("on-this-day");
@@ -106,7 +102,7 @@ function renderOnThisDay() {
   el.innerHTML = h;
 }
 
-// ========== 学期相册 ==========
+// ========== 学期相册（首页） ==========
 function renderAlbums() {
   const el = document.getElementById("album-list");
   if (!el) return;
@@ -136,34 +132,74 @@ function renderAlbums() {
   });
 }
 
+// ========== 学期内页：照片连续排列 ==========
 function showSemester(idx) {
   const sem = bandData.semesters[idx];
   if (!sem) return;
   document.getElementById("album-list").style.display = "none";
   document.getElementById("on-this-day").style.display = "none";
   document.getElementById("random-btn").style.display = "none";
+  document.getElementById("comment-btn").style.display = "none";
   const detail = document.getElementById("event-detail");
   detail.style.display = "block";
+
   let h = `<h2 class="semester-title">${semEmoji(sem.semester)} ${esc(sem.semester)}</h2>`;
-  sem.events.forEach(ev => { h += buildEventCardHTML(ev); });
+
+  sem.events.forEach(ev => {
+    if (!ev.photos?.length) return;
+    h += `<div class="event-section">`;
+    h += `<div class="event-section-header">
+      <span class="event-date">${fmtDate(ev.date)}</span>
+      <span class="event-section-title">${esc(ev.title)}</span>
+    </div>`;
+    h += `<div class="event-photos">`;
+    ev.photos.forEach((p, i) => {
+      h += `<div class="event-photo-item" data-full="${p}" data-title="${esc(ev.title)}" data-date="${fmtDate(ev.date)}">
+        <img src="${getThumb(p)}" loading="lazy">
+      </div>`;
+    });
+    h += `</div></div>`;
+  });
+
   document.getElementById("event-content").innerHTML = h;
+
+  // 点击照片 → 打开详情
+  document.querySelectorAll(".event-photo-item").forEach(item => {
+    item.addEventListener("click", () => openPhotoDetail(item));
+  });
+
   window.scrollTo(0, 0);
 }
 
-function buildEventCardHTML(ev) {
-  const key = eventKey(ev);
-  let h = `<div class="event-card-detail">`;
-  h += `<span class="event-date">${fmtDate(ev.date)}</span>`;
-  h += `<h3 class="event-title">${esc(ev.title)}</h3>`;
-  if (ev.photos?.length) {
-    h += `<div class="photo-grid">`;
-    ev.photos.forEach((p, i) => {
-      h += `<img src="${getThumb(p)}" data-full="${p}" data-index="${i}" loading="lazy">`;
-    });
-    h += `</div>`;
-  }
+// ========== 照片详情（大图+评论） ==========
+function openPhotoDetail(item) {
+  const full = item.dataset.full;
+  const title = item.dataset.title;
+  const date = item.dataset.date;
+
+  document.getElementById("event-detail").style.display = "none";
+  const detailView = document.getElementById("photo-detail");
+  detailView.style.display = "block";
+
+  let h = `<button class="back-btn" onclick="closePhotoDetail()">&#8592; 返回</button>`;
+  h += `<div class="photo-detail-card">`;
+  h += `<img src="${full}" class="photo-detail-img">`;
+  h += `<div class="photo-detail-info">`;
+  h += `<span class="event-date">${date}</span>`;
+  h += `<h3 class="event-title">${title}</h3>`;
   h += `</div>`;
-  return h;
+  h += `<div class="photo-detail-comments">`;
+  h += `<div id="photo-comments"></div>`;
+  h += `</div>`;
+  h += `</div>`;
+
+  detailView.innerHTML = h;
+  window.scrollTo(0, 0);
+}
+
+function closePhotoDetail() {
+  document.getElementById("photo-detail").style.display = "none";
+  document.getElementById("event-detail").style.display = "block";
 }
 
 function setupBackButton() {
@@ -171,11 +207,12 @@ function setupBackButton() {
     document.getElementById("event-detail").style.display = "none";
     document.getElementById("album-list").style.display = "grid";
     document.getElementById("random-btn").style.display = "";
+    document.getElementById("comment-btn").style.display = "";
     renderOnThisDay();
   });
 }
 
-// ========== 灯箱 ==========
+// ========== 灯箱（全屏看图） ==========
 function setupLightbox() {
   const lb = document.getElementById("lightbox");
   document.getElementById("lightbox-close").addEventListener("click", closeLightbox);
@@ -188,16 +225,14 @@ function setupLightbox() {
     if (e.key === "ArrowLeft") nav(-1);
     if (e.key === "ArrowRight") nav(1);
   });
-  document.addEventListener("click", e => {
-    const img = e.target.closest(".photo-grid img");
-    if (img) openLightbox(img);
-  });
 }
 
 function openLightbox(img) {
-  const grid = img.closest(".photo-grid");
-  currentLightboxPhotos = Array.from(grid.querySelectorAll("img")).map(i => i.dataset.full);
-  currentLightboxIndex = parseInt(img.dataset.index) || 0;
+  const grid = img.closest(".photo-grid") || img.closest(".event-photos");
+  if (!grid) return;
+  currentLightboxPhotos = Array.from(grid.querySelectorAll("[data-full]")).map(i => i.dataset.full);
+  currentLightboxIndex = currentLightboxPhotos.indexOf(img.dataset.full);
+  if (currentLightboxIndex < 0) currentLightboxIndex = 0;
   showLightbox();
 }
 
