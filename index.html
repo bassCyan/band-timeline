@@ -25,6 +25,7 @@
       <h1 id="band-name">时光相册</h1>
       <div class="header-actions">
         <button id="random-btn" class="action-btn">&#10024; 随机回忆</button>
+        <button id="comment-btn" class="action-btn" onclick="document.getElementById('form-modal').style.display='flex'">💬 留言</button>
       </div>
     </header>
 
@@ -45,6 +46,14 @@
     </footer>
   </div>
 
+  <!-- 留言表单弹窗 -->
+  <div id="form-modal" class="lightbox" style="display:none;" onclick="if(event.target===this)this.style.display='none'">
+    <div class="form-modal-box">
+      <button class="lightbox-close" onclick="document.getElementById('form-modal').style.display='none'">&times;</button>
+      <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSeZUkXf4e29Vh18PlB1ismwY59lll9YEvKIOqC0EhnKDM3Fsg/viewform?embedded=true" frameborder="0" marginheight="0" marginwidth="0" class="form-iframe">加载中…</iframe>
+    </div>
+  </div>
+
   <!-- 灯箱 -->
   <div id="lightbox" class="lightbox" style="display:none;">
     <button class="lightbox-close" id="lightbox-close">&times;</button>
@@ -53,7 +62,6 @@
     <button class="lightbox-next" id="lightbox-next">&#10095;</button>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/twikoo@1.6.39/dist/twikoo.all.min.js"></script>
   <script src="script.js"></script>
 </body>
 </html>

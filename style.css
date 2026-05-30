@@ -205,30 +205,18 @@ body {
 }
 .photo-grid img:hover { transform: scale(1.08); box-shadow: var(--shadow-lg), 0 0 0 2px var(--gold-500); }
 
-/* ========== 评论 (Twikoo) ========== */
-.comments-section {
-  margin-top: 16px; padding-top: 16px;
-  border-top: 1px solid hsla(230, 15%, 100%, 0.06);
+/* ========== 留言表单弹窗 ========== */
+.form-modal-box {
+  position: relative; width: 90%; max-width: 640px; height: 80vh;
+  background: var(--bg-card); border-radius: 16px; overflow: hidden;
+  box-shadow: var(--shadow-xl);
 }
-.comments-title { color: var(--text-secondary); font-size: 14px; font-weight: 600; margin-bottom: 12px; }
-
-/* Twikoo 深色主题适配 */
-.twikoo-container { margin-top: 8px; }
-.twikoo-container .tk-input,
-.twikoo-container .tk-submit,
-.twikoo-container .tk-comment,
-.twikoo-container .tk-nick,
-.twikoo-container .tk-content {
-  color: var(--text-primary) !important;
+.form-modal-box .lightbox-close {
+  position: absolute; top: 8px; right: 8px; z-index: 10;
+  background: hsla(230, 15%, 100%, 0.15); width: 36px; height: 36px;
 }
-.twikoo-container .tk-input {
-  background: var(--bg-secondary) !important;
-  border-color: hsla(230, 15%, 100%, 0.1) !important;
-}
-.twikoo-container .tk-submit {
-  background: var(--gold-400) !important;
-  color: var(--grey-900) !important;
-  border-radius: 8px !important;
+.form-iframe {
+  width: 100%; height: 100%; border: none;
 }
 
 /* ========== 灯箱 ========== */

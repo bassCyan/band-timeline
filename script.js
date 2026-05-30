@@ -1,7 +1,3 @@
-// ========== 配置 ==========
-// 部署 Twikoo 后，把 Vercel 的 URL 填到这里
-const TWIKOO_ENV_ID = "YOUR_VERCEL_URL";
-
 // ========== 全局状态 ==========
 let bandData = null;
 let currentLightboxPhotos = [];
@@ -84,17 +80,6 @@ function eventKey(ev) {
   return `${ev.date}-${ev.title}`.replace(/[^a-zA-Z0-9一-龥\-]/g, "_");
 }
 
-// ========== Twikoo 评论 ==========
-function initTwikoo() {
-  if (typeof twikoo === "undefined") return;
-  document.querySelectorAll(".twikoo-container").forEach(el => {
-    twikoo.init({
-      envId: TWIKOO_ENV_ID,
-      el: `#${el.id}`,
-    });
-  });
-}
-
 // ========== 往年今日 ==========
 function renderOnThisDay() {
   const el = document.getElementById("on-this-day");
@@ -162,7 +147,6 @@ function showSemester(idx) {
   let h = `<h2 class="semester-title">${semEmoji(sem.semester)} ${esc(sem.semester)}</h2>`;
   sem.events.forEach(ev => { h += buildEventCardHTML(ev); });
   document.getElementById("event-content").innerHTML = h;
-  initTwikoo();
   window.scrollTo(0, 0);
 }
 
@@ -178,10 +162,6 @@ function buildEventCardHTML(ev) {
     });
     h += `</div>`;
   }
-  h += `<div class="comments-section">
-    <h4 class="comments-title">💬 留言</h4>
-    <div id="tcomment-${key}" class="twikoo-container"></div>
-  </div>`;
   h += `</div>`;
   return h;
 }
