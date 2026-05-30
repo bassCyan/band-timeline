@@ -70,12 +70,6 @@ function fmtDate(s) {
   return p.length === 3 ? `${p[0]}.${p[1]}.${p[2]}` : s;
 }
 
-function semEmoji(s) {
-  if (s.includes("春")) return "🌱";
-  if (s.includes("秋")) return "🍂";
-  return "📷";
-}
-
 // ========== 往年今日 ==========
 function renderOnThisDay() {
   const el = document.getElementById("on-this-day");
@@ -91,10 +85,10 @@ function renderOnThisDay() {
   }));
   if (!hits.length) { el.style.display = "none"; return; }
   el.style.display = "block";
-  let h = `<h2 class="section-title">📅 往年今日</h2><div class="otd-grid">`;
+  let h = `<h2 class="section-title">往年今日</h2><div class="otd-grid">`;
   hits.forEach(e => {
     h += `<div class="otd-card" onclick="openOtdLightbox(this)">
-      <img src="${getThumb(e.photos[0])}" data-full="${e.photos[0]}" alt="${esc(e.title)}">
+      <img src="${esc(getThumb(e.photos[0]))}" data-full="${esc(e.photos[0])}" alt="${esc(e.title)}">
       <div class="otd-info"><span class="otd-year">${e.date.split("-")[0]}</span><span class="otd-title">${esc(e.title)}</span></div>
     </div>`;
   });
@@ -111,15 +105,16 @@ function renderAlbums() {
   bandData.semesters.forEach((s, i) => {
     const cover = s.events[0]?.photos?.[0];
     const total = s.events.reduce((n, e) => n + (e.photos?.length || 0), 0);
-    h += `<div class="album-card" data-idx="${i}">
-      <div class="album-cover" ${cover ? `style="background-image:url('${getThumb(cover)}')"` : ""}>
-        ${!cover ? `<span class="album-emoji">${semEmoji(s.semester)}</span>` : ""}
-      </div>
-      <div class="album-info">
-        <h3 class="album-title">${semEmoji(s.semester)} ${esc(s.semester)}</h3>
-        <p class="album-meta">${s.events.length} 个事件 · ${total} 张照片</p>
-      </div>
-    </div>`;
+    h += `<div class="album-card" data-idx="${i}">`;
+    h += `<div class="album-cover">`;
+    if (cover) {
+      h += `<img src="${esc(getThumb(cover))}" alt="${esc(s.semester)}" class="album-cover-img">`;
+    }
+    h += `</div>`;
+    h += `<div class="album-info">
+      <h3 class="album-title">${esc(s.semester)}</h3>
+      <p class="album-meta">${s.events.length} 个事件 · ${total} 张照片</p>
+    </div></div>`;
   });
   el.innerHTML = h;
   el.querySelectorAll(".album-card").forEach(card => {
@@ -143,7 +138,7 @@ function showSemester(idx) {
   const detail = document.getElementById("event-detail");
   detail.style.display = "block";
 
-  let h = `<h2 class="semester-title">${semEmoji(sem.semester)} ${esc(sem.semester)}</h2>`;
+  let h = `<h2 class="semester-title">${esc(sem.semester)}</h2>`;
 
   sem.events.forEach(ev => {
     if (!ev.photos?.length) return;
@@ -154,8 +149,8 @@ function showSemester(idx) {
     </div>`;
     h += `<div class="event-photos">`;
     ev.photos.forEach((p, i) => {
-      h += `<div class="event-photo-item" data-full="${p}" data-title="${esc(ev.title)}" data-date="${fmtDate(ev.date)}">
-        <img src="${getThumb(p)}" loading="lazy">
+      h += `<div class="event-photo-item" data-full="${esc(p)}" data-title="${esc(ev.title)}" data-date="${fmtDate(ev.date)}">
+        <img src="${esc(getThumb(p))}" loading="lazy">
       </div>`;
     });
     h += `</div></div>`;
@@ -183,15 +178,11 @@ function openPhotoDetail(item) {
 
   let h = `<button class="back-btn" onclick="closePhotoDetail()">&#8592; 返回</button>`;
   h += `<div class="photo-detail-card">`;
-  h += `<img src="${full}" class="photo-detail-img">`;
+  h += `<img src="${esc(full)}" class="photo-detail-img">`;
   h += `<div class="photo-detail-info">`;
   h += `<span class="event-date">${date}</span>`;
   h += `<h3 class="event-title">${title}</h3>`;
-  h += `</div>`;
-  h += `<div class="photo-detail-comments">`;
-  h += `<div id="photo-comments"></div>`;
-  h += `</div>`;
-  h += `</div>`;
+  h += `</div></div>`;
 
   detailView.innerHTML = h;
   window.scrollTo(0, 0);
@@ -225,15 +216,6 @@ function setupLightbox() {
     if (e.key === "ArrowLeft") nav(-1);
     if (e.key === "ArrowRight") nav(1);
   });
-}
-
-function openLightbox(img) {
-  const grid = img.closest(".photo-grid") || img.closest(".event-photos");
-  if (!grid) return;
-  currentLightboxPhotos = Array.from(grid.querySelectorAll("[data-full]")).map(i => i.dataset.full);
-  currentLightboxIndex = currentLightboxPhotos.indexOf(img.dataset.full);
-  if (currentLightboxIndex < 0) currentLightboxIndex = 0;
-  showLightbox();
 }
 
 function openOtdLightbox(card) {
